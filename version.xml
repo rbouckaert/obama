@@ -1,0 +1,5 @@
+<addon name='BeastAminoacidModelAveraging' version='0.0.1'>
+	<depends on='beast2' atleast='2.4.0'/>
+    <depends on='bModelTest' atleast='1.0.3'/>
+    <depends on='BEASTLabs' atleast='1.5.3'/>
+</addon>
