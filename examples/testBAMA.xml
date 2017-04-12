@@ -37,7 +37,7 @@ name="alignment">
 <map name="OneOnX" >beast.math.distributions.OneOnX</map>
 
 
-<run id="mcmc" spec="MCMC" chainLength="10000000">
+<run id="mcmc" spec="MCMC" chainLength="10000000" sampleFromPrior="true">
     <state id="state" storeEvery="5000">
         <tree id="Tree.t:protein" name="stateNode">
             <taxonset id="TaxonSet.protein" spec="TaxonSet">
@@ -81,8 +81,8 @@ name="alignment">
 <model spec="BAMA_JTT"/>
 <model spec="BAMA_LG"/>
 <model spec="BAMA_MtArt"/>
-<model spec="BAMA_MtMam"/>
 <model spec="BAMA_MtREV"/>
+<model spec="BAMA_MtMam"/>
 <model spec="BAMA_RtREV"/>
 <model spec="BAMA_VT"/>
 <model spec="BAMA_WAG"/>
@@ -127,7 +127,7 @@ name="alignment">
         <log idref="modelIndex.s:protein"/>
     </logger>
 
-    <logger id="screenlog" logEvery="1000">
+    <logger id="screenlog" logEvery="10000">
         <log idref="posterior"/>
         <log id="ESS.0" spec="util.ESS" arg="@posterior"/>
         <log idref="likelihood"/>
