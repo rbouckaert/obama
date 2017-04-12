@@ -23,15 +23,12 @@ import beast.util.XMLParser;
 public class OBAMAAanalyser extends Runnable {
 	public Input<XMLFile> xmlFileInput = new Input<>("xml", "XML file specifying the set of models", Validate.REQUIRED);
 	public Input<LogFile> traceFileInput = new Input<>("log","trace log file containing output of a bModelTest analysis", Validate.REQUIRED);
-	public Input<String> prefixInput = new Input<>("prefix", "prefix of the entry in the log file containing the substitution model trace (default 'modelIndex')" , "modelIndex");
 	public Input<Integer> burninInput = new Input<>("burnin", "percentage of the log file to disregard as burn-in (default 10)" , 10);
 
 	NumberFormat formatter = new DecimalFormat("##0.00");     
 
 	@Override
 	public void initAndValidate() {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override

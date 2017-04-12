@@ -45,12 +45,12 @@ name="alignment">
             </taxonset>
         </tree>
         <parameter id="birthRate.t:protein" name="stateNode">1.0</parameter>
-        <stateNode id="BAMA_ModelIndicator.s:protein" spec="parameter.IntegerParameter" lower="0" upper="14">0</stateNode>
-        <parameter id="BAMA_gammaShape.s:protein" name="stateNode">1.0</parameter>
-        <parameter id="BAMA_ProportionInvariable.s:protein" lower="0.0" name="stateNode" upper="1.0">0.1</parameter>
-        <stateNode id="BAMA_hasInvariableSites.s:protein" spec="parameter.IntegerParameter">1</stateNode>
-        <stateNode id="BAMA_hasGammaRates.s:protein" spec="parameter.IntegerParameter">1</stateNode>
-        <stateNode id="BAMA_useExternalFreqs.s:protein" spec="parameter.BooleanParameter">false</stateNode>
+        <stateNode id="OBAMA_ModelIndicator.s:protein" spec="parameter.IntegerParameter" lower="0" upper="14">0</stateNode>
+        <parameter id="OBAMA_gammaShape.s:protein" name="stateNode">1.0</parameter>
+        <parameter id="OBAMA_ProportionInvariable.s:protein" lower="0.0" name="stateNode" upper="1.0">0.1</parameter>
+        <stateNode id="OBAMA_hasInvariableSites.s:protein" spec="parameter.IntegerParameter">1</stateNode>
+        <stateNode id="OBAMA_hasGammaRates.s:protein" spec="parameter.IntegerParameter">1</stateNode>
+        <stateNode id="OBAMA_useExternalFreqs.s:protein" spec="parameter.BooleanParameter">false</stateNode>
     </state>
 
     <init id="RandomTree.t:protein" spec="beast.evolution.tree.RandomTree" estimate="false" initial="@Tree.t:protein" taxa="@protein">
@@ -65,12 +65,12 @@ name="alignment">
             <prior id="YuleBirthRatePrior.t:protein" name="distribution" x="@birthRate.t:protein">
                 <Uniform id="Uniform.1" name="distr" upper="Infinity"/>
             </prior>
-            <distribution id="BAMA_GammaShapePrior.s:protein" spec="beast.math.distributions.BMTPrior" count="@BAMA_hasGammaRates.s:protein" x="@BAMA_gammaShape.s:protein">
+            <distribution id="OBAMA_GammaShapePrior.s:protein" spec="beast.math.distributions.BMTPrior" count="@OBAMA_hasGammaRates.s:protein" x="@OBAMA_gammaShape.s:protein">
                 <Exponential id="Exponential.0" name="distr">
                     <parameter id="RealParameter.0" lower="0.0" name="mean" upper="0.0">1.0</parameter>
                 </Exponential>
             </distribution>
-            <distribution id="BAMA_PropInvariablePrior.s:protein" spec="beast.math.distributions.BMTPrior" count="@BAMA_hasInvariableSites.s:protein" x="@BAMA_ProportionInvariable.s:protein">
+            <distribution id="OBAMA_PropInvariablePrior.s:protein" spec="beast.math.distributions.BMTPrior" count="@OBAMA_hasInvariableSites.s:protein" x="@OBAMA_ProportionInvariable.s:protein">
                 <Beta id="Beta.0" name="distr">
                     <parameter id="RealParameter.1" lower="0.0" name="alpha" upper="0.0">1.0</parameter>
                     <parameter id="RealParameter.2" lower="0.0" name="beta" upper="0.0">4.0</parameter>
@@ -79,24 +79,25 @@ name="alignment">
         </distribution>
         <distribution id="likelihood" spec="util.CompoundDistribution" useThreads="true">
             <distribution id="treeLikelihood.protein" spec="ThreadedTreeLikelihood" data="@protein" tree="@Tree.t:protein">
-                <siteModel id="BAMA.s:protein" spec="BAMAModelTestSiteModel" gammaCategoryCount="4" hasGammaRates="@BAMA_hasGammaRates.s:protein" hasInvariantSites="@BAMA_hasInvariableSites.s:protein" proportionInvariant="@BAMA_ProportionInvariable.s:protein" shape="@BAMA_gammaShape.s:protein">
-                    <parameter id="BAMA_mutationRate.s:protein" estimate="false" name="mutationRate">1.0</parameter>
-                    <substModel id="BAMA_substmodel.s:protein" spec="BAMAModel" modelIndicator="@BAMA_ModelIndicator.s:protein" useExternalFreqs="@BAMA_useExternalFreqs.s:protein">
-                        <model id="BAMA_Blosum62.0" spec="BAMA_Blosum62"/>
-                        <model id="BAMA_CpREV.0" spec="BAMA_CpREV"/>
-                        <model id="BAMA_DCMut.0" spec="BAMA_DCMut"/>
-                        <model id="BAMA_Dayhoff.0" spec="BAMA_Dayhoff"/>
-                        <model id="BAMA_HIVb.0" spec="BAMA_HIVb"/>
-                        <model id="BAMA_HIVw.0" spec="BAMA_HIVw"/>
-                        <model id="BAMA_JTT.0" spec="BAMA_JTT"/>
-                        <model id="BAMA_LG.0" spec="BAMA_LG"/>
-                        <model id="BAMA_MtArt.0" spec="BAMA_MtArt"/>
-                        <model id="BAMA_MtREV.0" spec="BAMA_MtREV"/>
-                        <model id="BAMA_MtMam.0" spec="BAMA_MtMam"/>
-                        <model id="BAMA_RtREV.0" spec="BAMA_RtREV"/>
-                        <model id="BAMA_VT.0" spec="BAMA_VT"/>
-                        <model id="BAMA_WAG.0" spec="BAMA_WAG"/>
-                        <frequencies id="BAMA_empiricalFreqs.s:protein" spec="Frequencies" data="@protein"/>
+                <siteModel id="OBAMA.s:protein" spec="OBAMAModelTestSiteModel" gammaCategoryCount="4" hasGammaRates="@OBAMA_hasGammaRates.s:protein" hasInvariantSites="@OBAMA_hasInvariableSites.s:protein" proportionInvariant="@OBAMA_ProportionInvariable.s:protein" shape="@OBAMA_gammaShape.s:protein">
+                    <parameter id="OBAMA_mutationRate.s:protein" estimate="false" name="mutationRate">1.0</parameter>
+                    <substModel id="OBAMA_substmodel.s:protein" spec="OBAMAModel" modelIndicator="@OBAMA_ModelIndicator.s:protein" useExternalFreqs="@OBAMA_useExternalFreqs.s:protein">
+                        <model id="OBAMA_Blosum62.0" spec="OBAMA_Blosum62"/>
+                        <model id="OBAMA_CpREV.0" spec="OBAMA_CpREV"/>
+                        <model id="OBAMA_DCMut.0" spec="OBAMA_DCMut"/>
+                        <model id="OBAMA_Dayhoff.0" spec="OBAMA_Dayhoff"/>
+                        <model id="OBAMA_FLU.0" spec="OBAMA_FLU"/>
+                        <model id="OBAMA_HIVb.0" spec="OBAMA_HIVb"/>
+                        <model id="OBAMA_HIVw.0" spec="OBAMA_HIVw"/>
+                        <model id="OBAMA_JTT.0" spec="OBAMA_JTT"/>
+                        <model id="OBAMA_LG.0" spec="OBAMA_LG"/>
+                        <model id="OBAMA_MtArt.0" spec="OBAMA_MtArt"/>
+                        <model id="OBAMA_MtREV.0" spec="OBAMA_MtREV"/>
+                        <model id="OBAMA_MtMam.0" spec="OBAMA_MtMam"/>
+                        <model id="OBAMA_RtREV.0" spec="OBAMA_RtREV"/>
+                        <model id="OBAMA_VT.0" spec="OBAMA_VT"/>
+                        <model id="OBAMA_WAG.0" spec="OBAMA_WAG"/>
+                        <frequencies id="OBAMA_empiricalFreqs.s:protein" spec="Frequencies" data="@protein"/>
                     </substModel>
                 </siteModel>
                 <branchRateModel id="StrictClock.c:protein" spec="beast.evolution.branchratemodel.StrictClockModel">
@@ -122,17 +123,17 @@ name="alignment">
 
     <operator id="YuleModelWilsonBalding.t:protein" spec="WilsonBalding" tree="@Tree.t:protein" weight="3.0"/>
 
-    <operator id="BAMA_gammaShapeScaler.s:protein" spec="BMTScaleOperator" count="@BAMA_hasGammaRates.s:protein" parameter="@BAMA_gammaShape.s:protein" scaleFactor="0.5" weight="0.5"/>
+    <operator id="OBAMA_gammaShapeScaler.s:protein" spec="BMTScaleOperator" count="@OBAMA_hasGammaRates.s:protein" parameter="@OBAMA_gammaShape.s:protein" scaleFactor="0.5" weight="0.5"/>
 
-    <operator id="BAMA_ProportionInvariableScaler.s:protein" spec="BMTScaleOperator" count="@BAMA_hasInvariableSites.s:protein" parameter="@BAMA_ProportionInvariable.s:protein" scaleFactor="0.5" weight="0.5"/>
+    <operator id="OBAMA_ProportionInvariableScaler.s:protein" spec="BMTScaleOperator" count="@OBAMA_hasInvariableSites.s:protein" parameter="@OBAMA_ProportionInvariable.s:protein" scaleFactor="0.5" weight="0.5"/>
 
-    <operator id="BAMA_hasGammaRatesFlipper.s:protein" spec="BMTBirthDeathOperator" count="@BAMA_hasGammaRates.s:protein" rates="@BAMA_gammaShape.s:protein" weight="0.1"/>
+    <operator id="OBAMA_hasGammaRatesFlipper.s:protein" spec="BMTBirthDeathOperator" count="@OBAMA_hasGammaRates.s:protein" rates="@OBAMA_gammaShape.s:protein" weight="0.1"/>
 
-    <operator id="BAMA_hasInvariableSitesFlipper.s:protein" spec="BMTBirthDeathOperator" count="@BAMA_hasInvariableSites.s:protein" rates="@BAMA_ProportionInvariable.s:protein" weight="0.1"/>
+    <operator id="OBAMA_hasInvariableSitesFlipper.s:protein" spec="BMTBirthDeathOperator" count="@OBAMA_hasInvariableSites.s:protein" rates="@OBAMA_ProportionInvariable.s:protein" weight="0.1"/>
 
-    <operator id="BAMA_FreqsFlipOperator.s:protein" spec="BitFlipOperator" parameter="@BAMA_useExternalFreqs.s:protein" weight="0.1"/>
+    <operator id="OBAMA_FreqsFlipOperator.s:protein" spec="BitFlipOperator" parameter="@OBAMA_useExternalFreqs.s:protein" weight="0.1"/>
 
-    <operator id="BAMA_ModelIndicatorUniformOperator.s:protein" spec="UniformOperator" parameter="@BAMA_ModelIndicator.s:protein" weight="3.0"/>
+    <operator id="OBAMA_ModelIndicatorUniformOperator.s:protein" spec="UniformOperator" parameter="@OBAMA_ModelIndicator.s:protein" weight="3.0"/>
 
     <logger id="tracelog" fileName="protein.log" logEvery="1000" model="@posterior" sanitiseHeaders="true" sort="smart">
         <log idref="posterior"/>
@@ -142,20 +143,20 @@ name="alignment">
         <log id="TreeHeight.t:protein" spec="beast.evolution.tree.TreeHeightLogger" tree="@Tree.t:protein"/>
         <log idref="YuleModel.t:protein"/>
         <log idref="birthRate.t:protein"/>
-        <log idref="BAMA_ModelIndicator.s:protein"/>
-        <log idref="BAMA_gammaShape.s:protein"/>
-        <log idref="BAMA_ProportionInvariable.s:protein"/>
-        <log idref="BAMA_hasGammaRates.s:protein"/>
-        <log idref="BAMA_hasInvariableSites.s:protein"/>
-        <log id="BAMA_ActivePropInvariable.s:protein" spec="beast.util.Script" argnames="BAMA_ProportionInvariable BAMA_hasInvariableSites" expression="BAMA_ProportionInvariable * BAMA_hasInvariableSites">
-            <x idref="BAMA_ProportionInvariable.s:protein"/>
-            <x idref="BAMA_hasInvariableSites.s:protein"/>
+        <log idref="OBAMA_ModelIndicator.s:protein"/>
+        <log idref="OBAMA_gammaShape.s:protein"/>
+        <log idref="OBAMA_ProportionInvariable.s:protein"/>
+        <log idref="OBAMA_hasGammaRates.s:protein"/>
+        <log idref="OBAMA_hasInvariableSites.s:protein"/>
+        <log id="OBAMA_ActivePropInvariable.s:protein" spec="beast.util.Script" argnames="OBAMA_ProportionInvariable OBAMA_hasInvariableSites" expression="OBAMA_ProportionInvariable * OBAMA_hasInvariableSites">
+            <x idref="OBAMA_ProportionInvariable.s:protein"/>
+            <x idref="OBAMA_hasInvariableSites.s:protein"/>
         </log>
-        <log id="BAMA_ActiveGammaShape.s:protein" spec="beast.util.Script" argnames="BAMA_gammaShape BAMA_hasGammaRates" expression="BAMA_gammaShape * BAMA_hasGammaRates">
-            <x idref="BAMA_gammaShape.s:protein"/>
-            <x idref="BAMA_hasGammaRates.s:protein"/>
+        <log id="OBAMA_ActiveGammaShape.s:protein" spec="beast.util.Script" argnames="OBAMA_gammaShape OBAMA_hasGammaRates" expression="OBAMA_gammaShape * OBAMA_hasGammaRates">
+            <x idref="OBAMA_gammaShape.s:protein"/>
+            <x idref="OBAMA_hasGammaRates.s:protein"/>
         </log>
-        <log idref="BAMA_useExternalFreqs.s:protein"/>
+        <log idref="OBAMA_useExternalFreqs.s:protein"/>
     </logger>
 
     <logger id="screenlog" logEvery="1000">
