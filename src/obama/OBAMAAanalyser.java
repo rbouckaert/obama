@@ -20,7 +20,7 @@ import beast.evolution.substitutionmodel.EmpiricalSubstitutionModel;
 import beast.util.LogAnalyser;
 import beast.util.XMLParser;
 
-public class BAMAAanalyser extends Runnable {
+public class OBAMAAanalyser extends Runnable {
 	public Input<XMLFile> xmlFileInput = new Input<>("xml", "XML file specifying the set of models", Validate.REQUIRED);
 	public Input<LogFile> traceFileInput = new Input<>("log","trace log file containing output of a bModelTest analysis", Validate.REQUIRED);
 	public Input<String> prefixInput = new Input<>("prefix", "prefix of the entry in the log file containing the substitution model trace (default 'modelIndex')" , "modelIndex");
@@ -108,7 +108,7 @@ public class BAMAAanalyser extends Runnable {
 	}
 
 	public static void main(String[] args) throws Exception {
-		new Application(new BAMAAanalyser(), "BAMA Analyser", args);
+		new Application(new OBAMAAanalyser(), "BAMA Analyser", args);
 
 	}
 
