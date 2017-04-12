@@ -1,9 +1,7 @@
 package bama;
 
-import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -49,11 +47,12 @@ public class BAMAAanalyser extends Runnable {
 		for (Object o : objects) {
 			if (o instanceof BAMAModel) {
 				BAMAModel bamaModel = (BAMAModel) o;
+				Log.info("Processsing " + bamaModel.getID() + "\n");
 
 				List<EmpiricalSubstitutionModel> models = bamaModel.substModelInput.get();
 				int [] modelCount = new int[models.size()];
 				
-				String logEntry = bamaModel.modelIndexInput.get().getID();
+				String logEntry = bamaModel.modelIndicatorInput.get().getID();
 				if (!trace.getLabels().contains(logEntry) && logEntry.indexOf('.') > 0) {
 					logEntry = logEntry.substring(0, logEntry.indexOf('.'));
 				}

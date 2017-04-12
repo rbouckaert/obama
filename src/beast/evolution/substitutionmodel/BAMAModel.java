@@ -22,10 +22,10 @@ import beast.evolution.tree.Node;
 public class BAMAModel extends GeneralSubstitutionModel {
 	final public Input<BooleanParameter> useExternalFreqsInput = new Input<>("useExternalFreqs", "if false, use", new BooleanParameter("false"));
 	final public Input<List<EmpiricalSubstitutionModel>> substModelInput = new Input<>("model", "empicial amino acid substitution model", new ArrayList<>(), Validate.REQUIRED);
-	final public Input<IntegerParameter> modelIndexInput = new Input<>("modelIndex", "index of the model in list of models that is used for its rates and frequencies", Validate.REQUIRED);
+	final public Input<IntegerParameter> modelIndicatorInput = new Input<>("modelIndicator", "index of the model in list of models that is used for its rates and frequencies", Validate.REQUIRED);
 
 	BooleanParameter useExternalFreqs;
-	IntegerParameter modelIndex;
+	IntegerParameter modelIndicator;
 	List<EmpiricalSubstitutionModel> models;
 	
 	public BAMAModel() {
@@ -38,14 +38,14 @@ public class BAMAModel extends GeneralSubstitutionModel {
 
 		useExternalFreqs = useExternalFreqsInput.get();
 		models = substModelInput.get();
-		modelIndex = modelIndexInput.get();
-		if (modelIndex.getUpper() > models.size() - 1) {
-			Log.warning("Setting upper limit of " + modelIndex.getID() + " to " + (models.size()-1) +".");
-			modelIndex.setUpper(models.size() - 1);
+		modelIndicator = modelIndicatorInput.get();
+		if (modelIndicator.getUpper() > models.size() - 1) {
+			Log.warning("Setting upper limit of " + modelIndicator.getID() + " to " + (models.size()-1) +".");
+			modelIndicator.setUpper(models.size() - 1);
 		}
-		if (modelIndex.getLower() < 0) {
-			Log.warning("Setting lower limit of " + modelIndex.getID() + " to 0.");
-			modelIndex.setLower(0);
+		if (modelIndicator.getLower() < 0) {
+			Log.warning("Setting lower limit of " + modelIndicator.getID() + " to 0.");
+			modelIndicator.setLower(0);
 		}
 		
 		
@@ -69,7 +69,7 @@ public class BAMAModel extends GeneralSubstitutionModel {
 	
 	@Override
     protected void setupRelativeRates() {
-    	EmpiricalSubstitutionModel model = models.get(modelIndex.getValue());
+    	EmpiricalSubstitutionModel model = models.get(modelIndicator.getValue());
         System.arraycopy(model.m_empiricalRates, 0, relativeRates, 0, model.m_empiricalRates.length);
     }
 
@@ -78,14 +78,14 @@ public class BAMAModel extends GeneralSubstitutionModel {
 		if (useExternalFreqs.getValue()) {
 			return super.getFrequencies();
 		}
-    	EmpiricalSubstitutionModel model = models.get(modelIndex.getValue());
+    	EmpiricalSubstitutionModel model = models.get(modelIndicator.getValue());
         return model.getFrequencies();
 	}
 	
 	
     @Override
     public double[] getRateMatrix(Node node) {
-    	EmpiricalSubstitutionModel model = models.get(modelIndex.getValue());
+    	EmpiricalSubstitutionModel model = models.get(modelIndicator.getValue());
         double[][] matrix = model.getEmpiricalRates();
         int states = matrix.length;
         double[] rates = new double[states * states];
@@ -118,7 +118,7 @@ public class BAMAModel extends GeneralSubstitutionModel {
 			updateMatrix = true;
 			return true;
 		}
-		if (modelIndex.isDirtyCalculation()) {
+		if (modelIndicator.isDirtyCalculation()) {
 			updateMatrix = true;
 			return true;
 		}
