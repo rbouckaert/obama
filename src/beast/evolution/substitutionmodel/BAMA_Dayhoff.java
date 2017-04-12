@@ -4,7 +4,7 @@ import beast.evolution.datatype.Aminoacid;
 import beast.evolution.datatype.DataType;
 /** model data from codonPHYML, which is based on PHYML **/
 
-class BAMA_Dayhoff extends EmpiricalSubstitutionModel { 
+public class BAMA_Dayhoff extends EmpiricalSubstitutionModel { 
     @Override
     double[][] getEmpiricalRates() {
         double[][] rate = new double[20][20];
@@ -64,7 +64,7 @@ class BAMA_Dayhoff extends EmpiricalSubstitutionModel {
     rate[19][13] =   12.00; rate[19][14] =   48.00; rate[19][15] =   30.00; rate[19][16] =  157.00;
     rate[19][17] =    0.00; rate[19][18] =   28.00;
     
-       return rate;
+       for (int i = 0; i < 20; i++) for (int j = i + 1; j < 20; j++) rate[i][j] = rate[j][i]; return rate;
     }
 
     @Override
@@ -75,7 +75,7 @@ class BAMA_Dayhoff extends EmpiricalSubstitutionModel {
     f[ 4] = 0.033474; f[ 5] = 0.038255; f[ 6] = 0.049530; f[ 7] = 0.088612;
     f[ 8] = 0.033618; f[ 9] = 0.036886; f[10] = 0.085357; f[11] = 0.080482;
     f[12] = 0.014753; f[13] = 0.039772; f[14] = 0.050680; f[15] = 0.069577;
-    f[16] = 0.058542; f[17] = 0.010494; f[18] = 0.029916; f[19] = 0.064718;
+    f[16] = 0.058542; f[17] = 0.010494; f[18] = 0.029916; f[19] = 0.064717; // was 0.064718, but does not add to 1
         return f;
     }
 

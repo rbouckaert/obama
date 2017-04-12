@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import beast.core.Description;
+import beast.core.Function;
 import beast.core.Input;
 import beast.core.Input.Validate;
 import beast.core.parameter.BooleanParameter;
@@ -28,6 +29,10 @@ public class BAMAModel extends GeneralSubstitutionModel {
 	IntegerParameter modelIndex;
 	List<EmpiricalSubstitutionModel> models;
 	
+	public BAMAModel() {
+		ratesInput.setRule(Validate.OPTIONAL);
+	}
+	
 	@Override
 	public void initAndValidate() {
         frequencies = frequenciesInput.get();
@@ -43,7 +48,8 @@ public class BAMAModel extends GeneralSubstitutionModel {
 			Log.warning("Setting lower limit of " + modelIndex.getID() + " to 0.");
 			modelIndex.setLower(0);
 		}
-
+		
+		
         updateMatrix = true;
         nrOfStates = frequencies.getFreqs().length;
 
@@ -56,10 +62,18 @@ public class BAMAModel extends GeneralSubstitutionModel {
         //eigenSystem = new DefaultEigenSystem(m_nStates);
 
         rateMatrix = new double[nrOfStates][nrOfStates];
-        relativeRates = new double[ratesInput.get().getDimension()];
-        storedRelativeRates = new double[ratesInput.get().getDimension()];
+        relativeRates = new double[nrOfStates*(nrOfStates-1)];
+        storedRelativeRates = new double[nrOfStates*(nrOfStates-1)];
+
 	}
 	
+	
+	@Override
+    protected void setupRelativeRates() {
+    	EmpiricalSubstitutionModel model = models.get(modelIndex.getValue());
+        System.arraycopy(model.m_empiricalRates, 0, relativeRates, 0, model.m_empiricalRates.length);
+    }
+
 	@Override
 	public double[] getFrequencies() {
 		if (useExternalFreqs.getValue()) {
