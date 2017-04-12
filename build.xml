@@ -84,6 +84,7 @@
 		       memoryinitialsize="256m"
 		       memorymaximumsize="256m">
 			<include name="beast/**/**" />
+			<include name="bama/**/**" />
 			<!-- compile JUnit test classes -->
 			<include name="test/beast/**" />
 		</javac>

@@ -4,7 +4,7 @@ import beast.evolution.datatype.Aminoacid;
 import beast.evolution.datatype.DataType;
 /** model data from codonPHYML, which is based on PHYML **/
 
-public class BAMA_Dayhoff extends EmpiricalSubstitutionModel { 
+public class OBAMA_Dayhoff extends EmpiricalSubstitutionModel { 
     @Override
     double[][] getEmpiricalRates() {
         double[][] rate = new double[20][20];

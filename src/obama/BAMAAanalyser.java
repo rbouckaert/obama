@@ -1,4 +1,4 @@
-package bama;
+package obama;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -15,7 +15,7 @@ import beast.core.Runnable;
 import beast.core.util.Log;
 import beast.core.Input.Validate;
 import beast.core.MCMC;
-import beast.evolution.substitutionmodel.BAMAModel;
+import beast.evolution.substitutionmodel.OBAMAModel;
 import beast.evolution.substitutionmodel.EmpiricalSubstitutionModel;
 import beast.util.LogAnalyser;
 import beast.util.XMLParser;
@@ -45,8 +45,8 @@ public class BAMAAanalyser extends Runnable {
 		Set<Object> objects = new LinkedHashSet<>();
 		getObjets(mcmc, objects);
 		for (Object o : objects) {
-			if (o instanceof BAMAModel) {
-				BAMAModel bamaModel = (BAMAModel) o;
+			if (o instanceof OBAMAModel) {
+				OBAMAModel bamaModel = (OBAMAModel) o;
 				Log.info("Processsing " + bamaModel.getID() + "\n");
 
 				List<EmpiricalSubstitutionModel> models = bamaModel.substModelInput.get();
@@ -69,6 +69,10 @@ public class BAMAAanalyser extends Runnable {
 				    	if (modelName == null) {
 				    		modelName = model.getClass().getSimpleName();
 				    	}
+				    	if (modelName != null && modelName.indexOf('.') > 0) {
+				    		modelName = modelName.substring(0, modelName.lastIndexOf('.'));
+				    	}
+				    	modelName = modelName.replaceAll("BAMA_", "");
 						Log.info(modelCount[i] + "\t" + formatter.format(modelCount[i] * 100.0 / modelTrace.length) + "\t" + modelName);
 					}
 				}

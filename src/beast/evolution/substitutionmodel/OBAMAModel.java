@@ -19,7 +19,7 @@ import beast.evolution.tree.Node;
 @Description("Substitution model that can average over a number of amino acid substitution models " +
 		"as well as switch between the model's frequencies and external frequencies (as for example " +
 		"empirical frequencies informed by an alignment).")
-public class BAMAModel extends GeneralSubstitutionModel {
+public class OBAMAModel extends GeneralSubstitutionModel {
 	final public Input<BooleanParameter> useExternalFreqsInput = new Input<>("useExternalFreqs", "if false, use", new BooleanParameter("false"));
 	final public Input<List<EmpiricalSubstitutionModel>> substModelInput = new Input<>("model", "empicial amino acid substitution model", new ArrayList<>(), Validate.REQUIRED);
 	final public Input<IntegerParameter> modelIndicatorInput = new Input<>("modelIndicator", "index of the model in list of models that is used for its rates and frequencies", Validate.REQUIRED);
@@ -28,7 +28,7 @@ public class BAMAModel extends GeneralSubstitutionModel {
 	IntegerParameter modelIndicator;
 	List<EmpiricalSubstitutionModel> models;
 	
-	public BAMAModel() {
+	public OBAMAModel() {
 		ratesInput.setRule(Validate.OPTIONAL);
 	}
 	
