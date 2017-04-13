@@ -1,18 +1,18 @@
-<!-- Build BAMA. It is also used by Hudson BAMA project. JUnit test is available for this build. -->
-<project basedir="." default="addon" name="BUILD_BAMA">
+<!-- Build OBAMA. It is also used by Hudson OBAMA project. JUnit test is available for this build. -->
+<project basedir="." default="addon" name="BUILD_OBAMA">
 	<description>
-	    Build BAMA. 
-            Also used by Hudson BAMA project. 
+	    Build OBAMA. 
+            Also used by Hudson OBAMA project. 
 	    JUnit test is available for this build.
-	    $Id: build_BAMA.xml $
+	    $Id: build_OBAMA.xml $
 	</description>
 
 	<!-- set global properties for this build -->
-	<property name="srcBAMA" location="src" />
-	<property name="buildBAMA" location="build" />
-	<property name="libBAMA" location="lib" />
+	<property name="srcOBAMA" location="src" />
+	<property name="buildOBAMA" location="build" />
+	<property name="libOBAMA" location="lib" />
 	<property name="release_dir" value="release" />
-	<property name="distBAMA" location="${buildBAMA}/dist" />
+	<property name="distOBAMA" location="${buildOBAMA}/dist" />
 	<property name="BEASTLabsclasspath" location="../BEASTLabs/build" />
 	<property name="bModelTestClassPath" location="../bModelTest/build" />
 	<property name="beast2path" location="../beast2" />
@@ -24,10 +24,10 @@
     <import file="${beast2path}/build.xml" />
 
 	<property name="main_class_BEAST" value="beast.app.BeastMCMC" />
-	<property name="report" value="${buildBAMA}/junitreport"/>
+	<property name="report" value="${buildOBAMA}/junitreport"/>
 
 	<path id="classpath">
-        <pathelement path="${buildBAMA}"/>
+        <pathelement path="${buildOBAMA}"/>
 	<fileset dir="${libBeast2}" includes="antlr-runtime-4.5.jar"/>	
 	<fileset dir="${libBeast2}" includes="junit-4.8.2.jar"/>
 	<fileset dir="${libBeast2}" includes="fest.jar"/>
@@ -42,33 +42,33 @@
 	<!-- start -->
 
 
-	<target name="initBAMA">
+	<target name="initOBAMA">
 		<echo message="${ant.project.name}: ${ant.file}" />
 
 	</target>
 
-	<target name="cleanBAMA">
-    	<delete dir="${buildBAMA}" />
+	<target name="cleanOBAMA">
+    	<delete dir="${buildOBAMA}" />
 	</target>
 
 	<!-- clean previous build, and then compile Java source code, and Juint test -->
-	<target name="build_all_BAMA" depends="cleanBAMA,compile-allBAMA,junitBAMA"
+	<target name="build_all_OBAMA" depends="cleanOBAMA,compile-allOBAMA,junitOBAMA"
         description="Clean and Build all run-time stuff">
 	</target>
 
 	<!-- clean previous build, compile Java source code, and Junit test, and make the beast.jar and beauti.jar -->
-	<target name="build_jar_all_BAMA" depends="cleanBAMA,compile-allBAMA,junitBAMA,dist_all_BAMA"
+	<target name="build_jar_all_OBAMA" depends="cleanOBAMA,compile-allOBAMA,junitOBAMA,dist_all_OBAMA"
         description="Clean and Build all run-time stuff">
 	</target>
 
 
-	<!-- No JUnit Test, clean previous build, compile Java source code, and make the BAMA.jar and beauti.jar -->
-	<target name="build_jar_all_BAMA_NoJUnitTest" depends="cleanBAMA,compile-allBAMA,dist_all_BAMA"
+	<!-- No JUnit Test, clean previous build, compile Java source code, and make the OBAMA.jar and beauti.jar -->
+	<target name="build_jar_all_OBAMA_NoJUnitTest" depends="cleanOBAMA,compile-allOBAMA,dist_all_OBAMA"
         description="Clean and Build all run-time stuff">
 	</target>
 
 	<!-- compile Java source code -->
-	<target name="compile-allBAMA" depends="initBAMA,compile-all">
+	<target name="compile-allOBAMA" depends="initOBAMA,compile-all">
 
 
 	    <!-- Capture the path as a delimited property using the refid attribute -->
@@ -76,10 +76,10 @@
 	    <!-- Emit the property to the ant console -->
 	    <echo message="Classpath = ${myclasspath}"/>
 
-		<mkdir dir="${buildBAMA}" />
+		<mkdir dir="${buildOBAMA}" />
 
-		<!-- Compile the java code from ${srcBAMA} into ${buildBAMA} /bin -->
-		<javac srcdir="${srcBAMA}" destdir="${buildBAMA}" classpathref="classpath" 
+		<!-- Compile the java code from ${srcOBAMA} into ${buildOBAMA} /bin -->
+		<javac srcdir="${srcOBAMA}" destdir="${buildOBAMA}" classpathref="classpath" 
 		       fork="true"
 		       memoryinitialsize="256m"
 		       memorymaximumsize="256m">
@@ -92,17 +92,17 @@
 	</target>
 
 	<!-- make the beast.jar and beauti.jar -->
-	<target name="dist_all_BAMA" depends="compile-allBAMA" description="create BAMA jar">
+	<target name="dist_all_OBAMA" depends="compile-allOBAMA" description="create OBAMA jar">
 		<!-- Create the distribution directory -->
-		<mkdir dir="${distBAMA}" />
+		<mkdir dir="${distOBAMA}" />
 
-		<!-- Put everything in ${buildBAMA} into the beast.jar file -->
-		<jar jarfile="${distBAMA}/BAMA.jar">
+		<!-- Put everything in ${buildOBAMA} into the beast.jar file -->
+		<jar jarfile="${distOBAMA}/OBAMA.jar">
 			<manifest>
 				<attribute name="Built-By" value="${user.name}" />
 				<attribute name="Main-Class" value="${main_class_BEAST}" />
 			</manifest>
-			<fileset dir="${buildBAMA}">
+			<fileset dir="${buildOBAMA}">
 				<include name="**/*.class" />
 			</fileset>
 			<fileset dir="${BEASTLabsclasspath}">
@@ -116,18 +116,18 @@
 				<include name="**/*.class" />
 			</fileset>
 		</jar>
-		<jar jarfile="${distBAMA}/BAMA.src.jar">
-			<fileset dir="${srcBAMA}">
+		<jar jarfile="${distOBAMA}/OBAMA.src.jar">
+			<fileset dir="${srcOBAMA}">
 				<include name="**/*.java" />
 				<include name="**/*.png" />
 				<include name="**/*.xsl" />
 			</fileset>
         </jar>
-		<jar jarfile="${distBAMA}/BAMA.addon.jar">
+		<jar jarfile="${distOBAMA}/OBAMA.addon.jar">
 			<manifest>
 				<attribute name="Built-By" value="${user.name}" />
 			</manifest>
-			<fileset dir="${buildBAMA}">
+			<fileset dir="${buildOBAMA}">
 				<include name="**/*.class" />
 				<include name="**/*.class" />
 				<include name="**/*.properties" />
@@ -136,24 +136,24 @@
 	</target>
 
 	<!-- run beast.jar -->
-	<target name="run_BAMA">
-		<java jar="${distBAMA}/BAMA.jar" fork="true" />
+	<target name="run_OBAMA">
+		<java jar="${distOBAMA}/OBAMA.jar" fork="true" />
 	</target>
 
 	
 	<!-- JUnit test -->
-	<target name="junitBAMA">
+	<target name="junitOBAMA">
 		<mkdir dir="${report}" />
 		<junit printsummary="yes"> <!--showoutput='yes'-->
 			<classpath>
 				<path refid="classpath" />
-				<path location="${buildBAMA}" />
+				<path location="${buildOBAMA}" />
 			</classpath>
 
 			<formatter type="xml" />
 
 			<batchtest fork="yes" todir="${report}">
-				<fileset dir="${srcBAMA}">
+				<fileset dir="${srcOBAMA}">
                     <include name="test/**/*Test.java"/>                                         
 				</fileset>
 				<fileset dir="${srcBeast2}">
@@ -175,8 +175,8 @@
 
 
 	<target name="addon"
-	        depends="build_jar_all_BAMA_NoJUnitTest"
-	        description="release BEAST 2 add-on version of BAMA">
+	        depends="build_jar_all_OBAMA_NoJUnitTest"
+	        description="release BEAST 2 add-on version of OBAMA">
 
 		<delete dir="${Add_on_dir}" />
 		<!-- Create the release directory -->
@@ -192,16 +192,16 @@
 			<fileset dir="examples" />
 		</copy>
 		<copy todir="${Add_on_dir}/lib">
-			<fileset dir="${distBAMA}" includes="BAMA.addon.jar" />
+			<fileset dir="${distOBAMA}" includes="OBAMA.addon.jar" />
 		</copy>
 		<copy todir="${Add_on_dir}">
-			<fileset dir="${distBAMA}" includes="BAMA.src.jar" />
+			<fileset dir="${distOBAMA}" includes="OBAMA.src.jar" />
 		</copy>
 		<copy todir="${Add_on_dir}/templates">
-			<fileset file="templates/BAMA.xml" />
+			<fileset file="templates/OBAMA.xml" />
 		</copy>
 
-		<jar jarfile="${distBAMA}/BAMA.addon.v${version}.zip">
+		<jar jarfile="${distOBAMA}/OBAMA.addon.v${version}.zip">
 			<fileset dir="${Add_on_dir}">
 				<include name="**/*" />
 			</fileset>
