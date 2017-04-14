@@ -7,6 +7,7 @@ import java.util.List;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import beast.app.draw.EnumInputEditor;
@@ -49,6 +50,13 @@ public class OBAMAModelTestInputEditor extends SiteModelInputEditor {
 	@Override
 	public void init(Input<?> input, BEASTInterface plugin, int itemNr, ExpandOption bExpandOption, boolean bAddButtons) {
 		super.init(input, plugin, itemNr, bExpandOption, bAddButtons);
+		
+		Box o = (Box) getComponent(0);
+		JPanel p = (JPanel) o.getComponent(1);
+		JLabel l = (JLabel) p.getComponent(0);
+		l.setText("Subsitution rate:");
+		
+		
 		OBAMAModelTestSiteModel siteModel = (OBAMAModelTestSiteModel)input.get();
 		SubstitutionModel sm = siteModel.substModelInput.get();
 		EnumInputEditor typeEditor = new EnumInputEditor(doc);
@@ -61,15 +69,17 @@ public class OBAMAModelTestInputEditor extends SiteModelInputEditor {
 		for (EmpiricalSubstitutionModel m : availableModels) {
 			addCheckBox(m, models, k++);
 		}
-//		BooleanInputEditor useExternalFreqs = new BooleanInputEditor(doc);
-//		useExternalFreqs.init(substModel.useExternalFreqsInput, substModel, itemNr, bExpandOption, bAddButtons);
-//		((Box) getComponent(0)).add(useExternalFreqs, 3);
 		validate();
 	}
 
 	private void addCheckBox(EmpiricalSubstitutionModel m, List<EmpiricalSubstitutionModel> models, int offset) {
-		String modelLabel = m.getClass().getSimpleName();
+		String modelName = m.getClass().getSimpleName();
+		String modelLabel = modelName;
+		if (modelLabel.startsWith("OBAMA_")) {
+			modelLabel = modelLabel.substring(6);
+		}
 		JCheckBox checkBox = new JCheckBox(modelLabel);
+		checkBox.setName(modelName);
 		
 		boolean selected = false;
 		for (EmpiricalSubstitutionModel m0 : models) {
@@ -81,12 +91,11 @@ public class OBAMAModelTestInputEditor extends SiteModelInputEditor {
 		checkBox.setSelected(selected);
 		checkBox.addActionListener(e -> {
 			JCheckBox b = (JCheckBox) e.getSource();
-			String label = b.getText();
+			String label = b.getName();
 			setModel(label, b.isSelected());
 		});
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-
 		panel.add(checkBox);
 		panel.add(Box.createHorizontalGlue());
 		
