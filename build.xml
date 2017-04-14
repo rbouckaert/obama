@@ -84,10 +84,14 @@
 		       memoryinitialsize="256m"
 		       memorymaximumsize="256m">
 			<include name="beast/**/**" />
-			<include name="bama/**/**" />
+			<include name="obama/**/**" />
 			<!-- compile JUnit test classes -->
 			<include name="test/beast/**" />
 		</javac>
+        <copy todir="${buildOBAMA}">
+            <fileset dir="${srcOBAMA}" includes="**/*.properties" />
+            <fileset dir="${srcOBAMA}" includes="**/*.png" />
+        </copy>
 		<echo message="Successfully compiled." />
 	</target>
 
@@ -129,7 +133,7 @@
 			</manifest>
 			<fileset dir="${buildOBAMA}">
 				<include name="**/*.class" />
-				<include name="**/*.class" />
+				<include name="**/*.png" />
 				<include name="**/*.properties" />
 			</fileset>
 		</jar>
