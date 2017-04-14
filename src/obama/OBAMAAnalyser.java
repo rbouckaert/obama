@@ -20,7 +20,7 @@ import beast.evolution.substitutionmodel.EmpiricalSubstitutionModel;
 import beast.util.LogAnalyser;
 import beast.util.XMLParser;
 
-public class OBAMAAanalyser extends Runnable {
+public class OBAMAAnalyser extends Runnable {
 	public Input<XMLFile> xmlFileInput = new Input<>("xml", "XML file specifying the set of models", Validate.REQUIRED);
 	public Input<LogFile> traceFileInput = new Input<>("log","trace log file containing output of a bModelTest analysis", Validate.REQUIRED);
 	public Input<Integer> burninInput = new Input<>("burnin", "percentage of the log file to disregard as burn-in (default 10)" , 10);
@@ -69,7 +69,7 @@ public class OBAMAAanalyser extends Runnable {
 				    	if (modelName != null && modelName.indexOf('.') > 0) {
 				    		modelName = modelName.substring(0, modelName.lastIndexOf('.'));
 				    	}
-				    	modelName = modelName.replaceAll("BAMA_", "");
+				    	modelName = modelName.replaceAll("OBAMA_", "");
 						Log.info(modelCount[i] + "\t" + formatter.format(modelCount[i] * 100.0 / modelTrace.length) + "\t" + modelName);
 					}
 				}
@@ -105,7 +105,7 @@ public class OBAMAAanalyser extends Runnable {
 	}
 
 	public static void main(String[] args) throws Exception {
-		new Application(new OBAMAAanalyser(), "BAMA Analyser", args);
+		new Application(new OBAMAAnalyser(), "OBAMA Analyser", args);
 
 	}
 

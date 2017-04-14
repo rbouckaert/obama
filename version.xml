@@ -3,8 +3,9 @@
     <depends on='bModelTest' atleast='1.0.3'/>
     <depends on='BEASTLabs' atleast='1.5.3'/>
 
-    <addonapp description="OBAMAAanalyser"
-              class="obama.OBAMAAanalyser"
+    <addonapp description="OBAMAAnalyser"
+              class="obama.OBAMAAnalyser"
+              icon="obama/obama256.png"
               args=""
             />
 
