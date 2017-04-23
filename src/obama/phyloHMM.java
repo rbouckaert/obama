@@ -1,0 +1,316 @@
+package obama;
+
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+
+import beast.core.Description;
+import beast.core.Distribution;
+import beast.core.Input;
+import beast.core.Input.Validate;
+import beast.core.Loggable;
+import beast.core.State;
+import beast.core.parameter.RealParameter;
+import beast.evolution.alignment.Alignment;
+import beast.evolution.likelihood.TreeLikelihood;
+import beast.evolution.substitutionmodel.Frequencies;
+import beast.util.Randomizer;
+
+@Description("PhyloHMM combines hidden markov model (HMM) with tree likelihoods per site")
+public class phyloHMM extends Distribution implements Loggable {
+	final public Input<List<TreeLikelihood>> likelihoodsInput = new Input<>("treelikelihood", 
+			"treelikelihood, one for each state", 
+			new ArrayList<>(), Validate.REQUIRED);
+	final public Input<Frequencies> freqsInput = new Input<>("frequencies", "start frequencies for the HMM. Assumed uniform if not specified");
+	final public Input<RealParameter> ratesInput = new Input<>("rates", "rates for HMM transition probabilities", Validate.REQUIRED);
+	
+	enum hmmAlgorithm {Viterbi, backwardforward};
+	final public Input<hmmAlgorithm> hmmAlgorithmInput = new Input<>("HMMAlgorithm", "which HMM algorithm to use "
+			+ "", hmmAlgorithm.Viterbi, hmmAlgorithm.values());
+	
+	int siteCount, patternCount;
+	/** sitePatternIndex[siteCount] maps site index to pattern index **/
+	int [] sitePatternIndex;
+	int HMMStateCount; 
+	/**  HMMpartials[siteCount][HMMStateCount] **/
+	double [][] HMMpartials;
+	List<TreeLikelihood> likelihoods;
+	/** patternLogP[siteCount][HMMStateCount] **/
+	double [][] patternLogP;
+	
+	Alignment data;
+	RealParameter rates;
+	
+	Frequencies frequencies;
+	int [][] maxIndex = null;
+	
+	@Override
+	public void initAndValidate() {
+		likelihoods = likelihoodsInput.get();
+
+		HMMStateCount = likelihoods.size();
+		rates = ratesInput.get();
+		
+		// sanity checks
+		if (rates.getDimension() != HMMStateCount * HMMStateCount) {
+			throw new IllegalArgumentException("Dimension of rates should be " + (HMMStateCount * HMMStateCount) + " but is" + 
+					rates.getDimension() + " or perhaps the number of likelihoods should be " + Math.sqrt(rates.getDimension()) +
+					" but is " + HMMStateCount);
+		}
+		
+		data = likelihoods.get(0).dataInput.get();
+		for (TreeLikelihood likelihood : likelihoods) {
+			if (likelihood.dataInput.get() != data) {
+				throw new IllegalArgumentException("alignment of likelihoods should be the same, but likelihood " + 
+						likelihood.getID() + " has alignment " + likelihood.dataInput.get().getID() + " while " +
+						" likelihood " + likelihoods.get(0).getID() + " has alignment " + data.getID());
+			}
+		}
+		
+		frequencies = freqsInput.get();
+		if (frequencies.getFreqs().length != HMMStateCount) {
+			throw new IllegalArgumentException("Frequencies have wrong dimension: is " + frequencies.getFreqs().length +
+					" but expected " + HMMStateCount);
+		}
+		
+		// prep site pattern index
+		siteCount = data.getSiteCount();
+		sitePatternIndex = new int[siteCount];
+		for (int i = 0; i < siteCount; i++) {
+			sitePatternIndex[i] = data.getPatternIndex(i);
+		}
+		HMMpartials = new double[siteCount][HMMStateCount];
+		patternLogP = new double[HMMStateCount][];
+		
+		patternCount = data.getPatternCount();
+	}
+	
+	
+	@Override
+	public double calculateLogP() {
+		logP = 0;
+		
+		// collect pattern log likelihoods
+		for (int i = 0; i < HMMStateCount; i++) {
+			patternLogP[i] = likelihoods.get(i).getPatternLogLikelihoods();
+		}
+		
+		double [] freqs = frequencies.getFreqs();
+		
+		switch (hmmAlgorithmInput.get()) {
+		case Viterbi:
+			doViterbi(freqs);
+			break;
+		case backwardforward:
+			doForward(freqs);
+			break;
+		}
+		
+		return logP;
+	}
+	
+	
+	
+	private void doForward(double[] freqs) {
+		double [][] patternP = new double[patternCount][HMMStateCount];
+		double [] patternLogScale = new double[patternCount];
+		double logScale = 0;
+
+		for (int k = 0; k < patternCount; k++) {
+			double max = 0;
+			for (int i = 0; i < HMMStateCount; i++) {
+				max = Math.max(max, patternLogP[i][k]);
+			}
+			patternLogScale[k] = max;
+			for (int i = 0; i < HMMStateCount; i++) {
+				patternP[k][i] = Math.exp(patternLogP[i][k] - max);
+			}
+		}
+		
+		// initial state
+		double [] p0 = HMMpartials[0];
+		double [] P = patternP[sitePatternIndex[0]];
+		for (int i = 0; i < HMMStateCount; i++) {
+			p0[i] = freqs[i] * P[i];
+		}
+		
+		double [] transitionRates = rates.getDoubleValues();
+		double [] p1;
+		
+		// forward
+		for (int i = 1; i < siteCount; i++) {
+			
+			p0 = HMMpartials[i - 1];
+			p1 = HMMpartials[i];
+			
+			P = patternP[sitePatternIndex[i]];
+			for (int u = 0; u < HMMStateCount; u++) {
+				double sum = 0;
+				for (int v = 0; v < HMMStateCount; v++) {
+					sum += transitionRates[u * HMMStateCount + v] * p0[v];
+				}
+				p1[u] = sum * P[u];
+			}
+			// determine scale
+			double max = p1[0];
+			for (int u = 1; u < HMMStateCount; u++) {
+				max = Math.max(max, p1[u]);
+			}
+			for (int u = 0; u < HMMStateCount; u++) {
+				p1[u] /= max;
+			}
+			logScale += Math.log(max);
+		}
+		
+		
+		double totalP = 0;
+		p1 = HMMpartials[siteCount - 1];
+		for (int u = 0; u < HMMStateCount; u++) {
+			totalP += p1[u];
+		}
+		logP = Math.log(totalP) + logScale;
+		int [] weights = data.getWeights();
+		for (int i = 0; i < patternCount; i++) {
+			logP += patternLogScale[i] * weights[i];
+		}
+	}
+
+	/** calc state distributions in backward sweep **/
+	void backward() {
+		double [] transitionRates = rates.getDoubleValues();
+		normalise(HMMpartials[siteCount - 1]);
+		
+		for (int i = siteCount-2; i >= 0; i--) {
+			
+			double [] p1 = HMMpartials[i];
+			double [] p0 = HMMpartials[i + 1];
+			
+			for (int u = 0; u < HMMStateCount; u++) {
+				double sum = 0;
+				for (int v = 0; v < HMMStateCount; v++) {
+					sum += transitionRates[u * HMMStateCount + v] * p0[v];
+				}
+				p1[u] *= sum;
+			}
+			normalise(p1);
+			
+		}
+		
+	}
+
+	/** scale to ensure distribution adds to 1 **/
+	private void normalise(double[] p1) {
+		double sum = 0;
+		for (double d : p1) {
+			sum += d;
+		}
+		for (int u = 0; u < HMMStateCount; u++) {
+			p1[u] /= sum;
+		}
+	}
+
+
+	private void doViterbi(double[] freqs) {
+		if (maxIndex == null) {
+			maxIndex = new int[siteCount][HMMStateCount];
+		}
+		double [] p0 = HMMpartials[0];
+		int siteIndex = sitePatternIndex[0];
+		for (int i = 0; i < HMMStateCount; i++) {
+			p0[i] = Math.log(freqs[i]) + patternLogP[i][siteIndex];
+		}
+		
+		double [] transitionRates = rates.getDoubleValues();
+		// to log
+		for (int i = 0; i < transitionRates.length; i++) {
+			transitionRates[i] = Math.log(transitionRates[i]);
+		}
+		double [] p1;
+		
+		// forward
+		for (int i = 1; i < siteCount; i++) {
+			
+			p0 = HMMpartials[i - 1];
+			p1 = HMMpartials[i];
+			
+			siteIndex = sitePatternIndex[i];
+			for (int u = 0; i < HMMStateCount; u++) {
+				double max = 0;
+				int iMax = -1;
+				for (int v = 0; v < HMMStateCount; v++) {
+					if (transitionRates[u * HMMStateCount + v] + p0[v]> max) {
+						max = transitionRates[u * HMMStateCount + v] + p0[v];
+						iMax = v;
+					}
+				}
+				p1[u] = max + patternLogP[u][siteIndex];
+				maxIndex[i][u] = iMax;
+			}
+		}
+		
+	}
+	
+	void backwardViterbi() {
+		// backward
+		int [] path = new int[siteCount];
+		double max = 0;
+		int iMax = -1;
+		double [] p1 = HMMpartials[siteCount - 1];
+		for (int v = 0; v < HMMStateCount; v++) {
+			if (p1[v] > max) {
+				max = p1[v];
+				iMax = v;
+			}
+		}
+		path[siteCount - 1] = iMax;
+		logP = p1[iMax];
+		Arrays.fill(p1,0); p1[iMax] = 1.0;
+		
+		for (int i = siteCount-2; i >= 0; i--) {
+			iMax = maxIndex[i + 1][path[i+1]];
+			path[i] = iMax;			
+			Arrays.fill(HMMpartials[i],0); 
+			HMMpartials[i][iMax] = 1.0;
+		}
+	}
+
+
+	@Override
+	public List<String> getArguments() {return null;}
+	@Override
+	public List<String> getConditions() {return null;}
+	@Override
+	public void sample(State state, Random random) {}
+
+	@Override
+	public void init(PrintStream out) {
+		super.init(out);
+
+		for (int i = 0; i < siteCount; i++) {
+			out.print(getID() + "-site" + i + "\t");  
+		}
+	}
+
+	@Override
+	public void log(int sample, PrintStream out) {
+		super.log(sample, out);
+
+		calculateLogP();
+		switch (hmmAlgorithmInput.get()) {
+		case backwardforward:
+			backward();
+			break;
+
+		case Viterbi:
+			backwardViterbi();
+			break;
+		}
+		
+		for (int i = 0; i < siteCount; i++) {
+			out.print(Randomizer.randomChoicePDF(HMMpartials[i]) + "\t");  
+		}
+	}
+	
+} // phyloHMM
