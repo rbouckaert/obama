@@ -27,6 +27,8 @@ public class PhyloHMM extends Distribution {
 	final public Input<hmmAlgorithm> hmmAlgorithmInput = new Input<>("HMMAlgorithm", "which HMM algorithm to use "
 			+ "", hmmAlgorithm.Viterbi, hmmAlgorithm.values());
 	
+	final public Input<String> stateLabelsInput = new Input<>("stateLabels", "comma separated list of labels for each of the states in the HMM");
+	
 	int siteCount, patternCount;
 	/** sitePatternIndex[siteCount] maps site index to pattern index **/
 	int [] sitePatternIndex;
@@ -44,11 +46,25 @@ public class PhyloHMM extends Distribution {
 	Frequencies frequencies;
 	int [][] maxIndex = null;
 	
+	String [] stateLabels;
+	
 	@Override
 	public void initAndValidate() {
 		likelihoods = likelihoodsInput.get();
-
+		
 		HMMStateCount = likelihoods.size();
+		if (stateLabelsInput.get() != null) {
+			stateLabels = stateLabelsInput.get().split(",");
+			if (stateLabels.length != HMMStateCount) {
+				throw new IllegalArgumentException("Number of state labels (" + stateLabels.length +") does not "
+						+ "match number of likelihoods (" + HMMStateCount +")\n");
+			}
+		} else {
+			stateLabels = new String[HMMStateCount];
+			for (int i = 0; i < HMMStateCount; i++) {
+				stateLabels[i] = "state" + i;
+			}
+		}
 		rates = ratesInput.get();
 		
 		// sanity checks
@@ -121,7 +137,7 @@ public class PhyloHMM extends Distribution {
 	
 	
 	
-	private void doForward(double[] freqs) {
+	void doForward(double[] freqs) {
 		double [][] patternP = new double[patternCount][HMMStateCount];
 		double [] patternLogScale = new double[patternCount];
 		double logScale = 0;
@@ -209,7 +225,7 @@ public class PhyloHMM extends Distribution {
 	}
 
 	/** scale to ensure distribution adds to 1 **/
-	private void normalise(double[] p1) {
+	void normalise(double[] p1) {
 		double sum = 0;
 		for (double d : p1) {
 			sum += d;
@@ -220,7 +236,8 @@ public class PhyloHMM extends Distribution {
 	}
 
 
-	private void doViterbi(double[] freqs) {
+	/** dense implementation of forward Viterbi **/
+	void doViterbi(double[] freqs) {
 		if (maxIndex == null) {
 			maxIndex = new int[siteCount][HMMStateCount];
 		}
