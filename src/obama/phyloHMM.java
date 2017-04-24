@@ -70,6 +70,12 @@ public class phyloHMM extends Distribution implements Loggable {
 		}
 		
 		frequencies = freqsInput.get();
+		if (frequencies == null) {
+			this.frequencies = new Frequencies();
+			RealParameter frequencies = new RealParameter("" + 1.0/HMMStateCount);
+			frequencies.setDimension(HMMStateCount);
+			this.frequencies.initByName("frequencies", frequencies);
+		}
 		if (frequencies.getFreqs().length != HMMStateCount) {
 			throw new IllegalArgumentException("Frequencies have wrong dimension: is " + frequencies.getFreqs().length +
 					" but expected " + HMMStateCount);
@@ -91,6 +97,13 @@ public class phyloHMM extends Distribution implements Loggable {
 	@Override
 	public double calculateLogP() {
 		logP = 0;
+		
+		for (TreeLikelihood likelihood : likelihoods) {
+			if (likelihood.isDirtyCalculation()) {
+				likelihood.calculateLogP();
+			}
+		}
+			
 		
 		// collect pattern log likelihoods
 		for (int i = 0; i < HMMStateCount; i++) {
@@ -236,8 +249,8 @@ public class phyloHMM extends Distribution implements Loggable {
 			p1 = HMMpartials[i];
 			
 			siteIndex = sitePatternIndex[i];
-			for (int u = 0; i < HMMStateCount; u++) {
-				double max = 0;
+			for (int u = 0; u < HMMStateCount; u++) {
+				double max = Double.NEGATIVE_INFINITY;
 				int iMax = -1;
 				for (int v = 0; v < HMMStateCount; v++) {
 					if (transitionRates[u * HMMStateCount + v] + p0[v]> max) {
@@ -250,6 +263,16 @@ public class phyloHMM extends Distribution implements Loggable {
 			}
 		}
 		
+		p1 = HMMpartials[siteCount - 1];
+		double max = Double.NEGATIVE_INFINITY;
+		int iMax = -1;
+		for (int v = 0; v < HMMStateCount; v++) {
+			if (p1[v] > max) {
+				max = p1[v];
+				iMax = v;
+			}
+		}
+		logP = p1[iMax];
 	}
 	
 	void backwardViterbi() {
@@ -311,6 +334,11 @@ public class phyloHMM extends Distribution implements Loggable {
 		for (int i = 0; i < siteCount; i++) {
 			out.print(Randomizer.randomChoicePDF(HMMpartials[i]) + "\t");  
 		}
+	}
+	
+	@Override
+	protected boolean requiresRecalculation() {
+		return super.requiresRecalculation();
 	}
 	
 } // phyloHMM
