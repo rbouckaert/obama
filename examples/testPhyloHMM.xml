@@ -54,11 +54,14 @@ id="primate-mtDNA">
     	</plate>
         
         <parameter id="HMMRates" lower="0.0" name="stateNode" value="
-        	0.99 0.01  0    0 
-        	0    0     1    0
-        	0    0     0    1
-        	0.01 0.99  0    0
+        	0.99   0   0    0.01 
+        	0.01   0   0    0.99
+        	0      1   0    0
+        	0      0   1    0
         	"/>
+        <!-- column = origin state -->
+        <!-- row    = target state -->
+        <!-- states: NC, codon position 1, codon position 2, codon position 3 -->
     </state>
 
     <init id="RandomTree.t:tree" spec="beast.evolution.tree.RandomTree" estimate="false" initial="@Tree.t:tree" taxa="@primate-mtDNA">
