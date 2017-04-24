@@ -1,6 +1,5 @@
 package obama;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -10,16 +9,14 @@ import beast.core.Description;
 import beast.core.Distribution;
 import beast.core.Input;
 import beast.core.Input.Validate;
-import beast.core.Loggable;
 import beast.core.State;
 import beast.core.parameter.RealParameter;
 import beast.evolution.alignment.Alignment;
 import beast.evolution.likelihood.TreeLikelihood;
 import beast.evolution.substitutionmodel.Frequencies;
-import beast.util.Randomizer;
 
 @Description("PhyloHMM combines hidden markov model (HMM) with tree likelihoods per site")
-public class phyloHMM extends Distribution implements Loggable {
+public class PhyloHMM extends Distribution {
 	final public Input<List<TreeLikelihood>> likelihoodsInput = new Input<>("treelikelihood", 
 			"treelikelihood, one for each state", 
 			new ArrayList<>(), Validate.REQUIRED);
@@ -39,6 +36,7 @@ public class phyloHMM extends Distribution implements Loggable {
 	List<TreeLikelihood> likelihoods;
 	/** patternLogP[siteCount][HMMStateCount] **/
 	double [][] patternLogP;
+	double [][] storedPatternLogP;
 	
 	Alignment data;
 	RealParameter rates;
@@ -91,6 +89,7 @@ public class phyloHMM extends Distribution implements Loggable {
 		patternLogP = new double[HMMStateCount][];
 		
 		patternCount = data.getPatternCount();
+		storedPatternLogP = new double[HMMStateCount][patternCount];
 	}
 	
 	
@@ -98,16 +97,12 @@ public class phyloHMM extends Distribution implements Loggable {
 	public double calculateLogP() {
 		logP = 0;
 		
-		for (TreeLikelihood likelihood : likelihoods) {
-			if (likelihood.isDirtyCalculation()) {
-				likelihood.calculateLogP();
-			}
-		}
-			
-		
 		// collect pattern log likelihoods
 		for (int i = 0; i < HMMStateCount; i++) {
-			patternLogP[i] = likelihoods.get(i).getPatternLogLikelihoods();
+			if (likelihoods.get(i).isDirtyCalculation()) {
+				likelihoods.get(i).calculateLogP();
+				patternLogP[i] = likelihoods.get(i).getPatternLogLikelihoods();
+			}
 		}
 		
 		double [] freqs = frequencies.getFreqs();
@@ -278,7 +273,7 @@ public class phyloHMM extends Distribution implements Loggable {
 	void backwardViterbi() {
 		// backward
 		int [] path = new int[siteCount];
-		double max = 0;
+		double max = Double.NEGATIVE_INFINITY;
 		int iMax = -1;
 		double [] p1 = HMMpartials[siteCount - 1];
 		for (int v = 0; v < HMMStateCount; v++) {
@@ -306,36 +301,26 @@ public class phyloHMM extends Distribution implements Loggable {
 	public List<String> getConditions() {return null;}
 	@Override
 	public void sample(State state, Random random) {}
+	
 
 	@Override
-	public void init(PrintStream out) {
-		super.init(out);
-
-		for (int i = 0; i < siteCount; i++) {
-			out.print(getID() + "-site" + i + "\t");  
-		}
-	}
-
-	@Override
-	public void log(int sample, PrintStream out) {
-		super.log(sample, out);
-
-		calculateLogP();
-		switch (hmmAlgorithmInput.get()) {
-		case backwardforward:
-			backward();
-			break;
-
-		case Viterbi:
-			backwardViterbi();
-			break;
-		}
+	public void store() {
+		super.store();
 		
-		for (int i = 0; i < siteCount; i++) {
-			out.print(Randomizer.randomChoicePDF(HMMpartials[i]) + "\t");  
+		for (int i = 0; i < HMMStateCount; i++) {
+			System.arraycopy(patternLogP[i], 0, storedPatternLogP[i], 0, patternCount);
 		}
 	}
 	
+	@Override
+	public void restore() {
+		super.restore();
+		
+		double [][] tmp = patternLogP;
+		patternLogP = storedPatternLogP;
+		storedPatternLogP = tmp;
+	}
+
 	@Override
 	protected boolean requiresRecalculation() {
 		return super.requiresRecalculation();

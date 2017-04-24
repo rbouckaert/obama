@@ -83,7 +83,7 @@ id="primate-mtDNA">
 
         </distribution>
         <distribution id="likelihood" spec="util.CompoundDistribution" useThreads="true">
-			<distribution spec="obama.phyloHMM">        
+			<distribution spec="obama.PhyloHMM" id="PhyloHMM">        
 	        	<plate var="n" range="1,2,3,4">
     	    	    <treelikelihood id="treeLikelihood.state$(n)" spec="TreeLikelihood" data="@primate-mtDNA"  branchRateModel="@StrictClock.c:clock" tree="@Tree.t:tree">
         	    	    <siteModel id="SiteModel.s:state$(n)" spec="SiteModel" mutationRate="@mutationRate.s:state$(n)">
@@ -132,7 +132,7 @@ id="primate-mtDNA">
 
 
 
-    <logger id="tracelog" fileName="primate-mtDNA.log" logEvery="1000" model="@posterior" sanitiseHeaders="true" sort="smart">
+    <logger id="tracelog" fileName="primate-mtDNA.log" logEvery="10000" model="@posterior" sanitiseHeaders="true" sort="smart">
         <log idref="posterior"/>
         <log idref="likelihood"/>
         <log idref="prior"/>
@@ -145,19 +145,23 @@ id="primate-mtDNA">
 	        <log idref="mutationRate.s:state$(n)"/>
     	    <log idref="freqParameter.s:state$(n)"/>
         </plate>
+        <log idref="PhyloHMM"/>
     </logger>
 
-    <logger id="screenlog" logEvery="1000">
+    <logger id="screenlog" logEvery="10000">
         <log idref="posterior"/>
         <log id="ESS.0" spec="util.ESS" arg="@posterior"/>
         <log idref="likelihood"/>
         <log idref="prior"/>
     </logger>
 
-    <logger id="treelog.t:tree" fileName="primate-mtDNA.trees" logEvery="1000" mode="tree">
+    <logger id="treelog.t:tree" fileName="primate-mtDNA.trees" logEvery="10000" mode="tree">
         <log id="TreeWithMetaDataLogger.t:tree" spec="beast.evolution.tree.TreeWithMetaDataLogger" tree="@Tree.t:tree"/>
     </logger>
 
+    <logger id="tracelog2" fileName="primate-mtDNA-phyloHMM.log" logEvery="10000">
+    	<log spec="obama.PhyloHMMLogger" phyloHMM="@PhyloHMM"/>
+    </logger>
 </run>
 
 </beast>
