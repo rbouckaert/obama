@@ -48,6 +48,8 @@ public class PhyloHMM extends Distribution {
 	
 	String [] stateLabels;
 	
+	boolean isDense = true;
+	
 	@Override
 	public void initAndValidate() {
 		likelihoods = likelihoodsInput.get();
@@ -68,7 +70,7 @@ public class PhyloHMM extends Distribution {
 		rates = ratesInput.get();
 		
 		// sanity checks
-		if (rates.getDimension() != HMMStateCount * HMMStateCount) {
+		if (isDense && rates.getDimension() != HMMStateCount * HMMStateCount) {
 			throw new IllegalArgumentException("Dimension of rates should be " + (HMMStateCount * HMMStateCount) + " but is" + 
 					rates.getDimension() + " or perhaps the number of likelihoods should be " + Math.sqrt(rates.getDimension()) +
 					" but is " + HMMStateCount);

@@ -17,12 +17,16 @@ public class PhyloHMMSparse extends PhyloHMM {
 	int [] from;
 	int [] to;
 	
+	public PhyloHMMSparse() {
+		isDense = false;
+	}
+	
 	@Override
 	public void initAndValidate() {
 		List<Transition> transitions = transitionsInput.get();		
-		if (transitions.size() != rates.getDimension()) {
+		if (transitions.size() != ratesInput.get().getDimension()) {
 			throw new IllegalArgumentException("Number of transitions (" + transitions.size()+ ") "
-					+ "should be same as dimension of rates (" + rates.getDimension() + ")");
+					+ "should be same as dimension of rates (" + ratesInput.get().getDimension() + ")");
 		}
 
 		super.initAndValidate();
@@ -30,11 +34,25 @@ public class PhyloHMMSparse extends PhyloHMM {
 		// set up from/to arrays
 
 		Map<String, Integer> map = new LinkedHashMap<>();
+		if (stateLabelsInput.get() != null) {
+			for (int i = 0; i < stateLabels.length; i++) {
+				map.put(stateLabels[i], i);
+			}
+		}
+		
 		for (Transition t : transitionsInput.get()) {
 			if (!map.containsKey(t.getFrom())) {
+				if (stateLabelsInput.get() != null) {
+					throw new IllegalArgumentException("Transition input from (" + t.getFrom() + ") is not in "
+							+ "labels. Typo perhaps?");
+				}
 				map.put(t.getFrom(), map.size());
 			}
 			if (!map.containsKey(t.getTo())) {
+				if (stateLabelsInput.get() != null) {
+					throw new IllegalArgumentException("Transition input to (" + t.getTo() + ") is not in "
+							+ "labels. Typo perhaps?");
+				}
 				map.put(t.getTo(), map.size());
 			}
 		}
@@ -45,6 +63,7 @@ public class PhyloHMMSparse extends PhyloHMM {
 		for (Transition t : transitionsInput.get()) {
 			from[k] = map.get(t.getFrom());
 			to[k] = map.get(t.getTo());
+			k++;
 		}
 		
 		
