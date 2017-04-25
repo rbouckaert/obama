@@ -3,8 +3,10 @@ package obama;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -16,6 +18,7 @@ import beast.core.Distribution;
 import beast.core.Input;
 import beast.core.Input.Validate;
 import beast.core.State;
+import beast.core.parameter.IntegerParameter;
 import beast.core.parameter.RealParameter;
 import beast.core.util.Log;
 import beast.evolution.alignment.Alignment;
@@ -35,7 +38,9 @@ public class PhyloHMM extends Distribution {
 			+ "", hmmAlgorithm.Viterbi, hmmAlgorithm.values());
 	
 	final public Input<String> stateLabelsInput = new Input<>("stateLabels", "comma separated list of labels for each of the states in the HMM");
-
+	final public Input<IntegerParameter> stateToOutputMapInput = new Input<>("stateToOutputMap", "map that links HMM states with an output. "
+			+ "If not specified, each state is assumed to have a unique output."); 
+	
 	// threading
     final public Input<Boolean> useThreadsInput = new Input<>("useThreads", "calculated the distributions in parallel using threads (default true)", true);
     final public Input<Integer> maxNrOfThreadsInput = new Input<>("threads","maximum number of threads to use, if less than 1 the number of threads in BeastMCMC is used (default -1)", -1);
@@ -44,11 +49,11 @@ public class PhyloHMM extends Distribution {
 	int siteCount, patternCount;
 	/** sitePatternIndex[siteCount] maps site index to pattern index **/
 	int [] sitePatternIndex;
-	int HMMStateCount; 
+	int HMMStateCount, HMMOutputCount; 
 	/**  HMMpartials[siteCount][HMMStateCount] **/
 	double [][] HMMpartials;
 	List<TreeLikelihood> likelihoods;
-	/** patternLogP[siteCount][HMMStateCount] **/
+	/** patternLogP[siteCount][HMMOutputCount] **/
 	double [][] patternLogP;
 	double [][] storedPatternLogP;
 	
@@ -67,29 +72,68 @@ public class PhyloHMM extends Distribution {
     boolean useThreads;
     int nrOfThreads;
     ExecutorService exec;
+    
+    IntegerParameter stateToOutputMap;
+    int [] map;
 
 	@Override
 	public void initAndValidate() {
 		likelihoods = likelihoodsInput.get();
 		
-		HMMStateCount = likelihoods.size();
+		if (stateToOutputMapInput.get() == null) {
+			HMMStateCount = likelihoods.size();
+			HMMOutputCount = HMMStateCount;
+			map = new int[HMMStateCount];
+			for (int i = 0; i < HMMStateCount; i++) {
+				map[i] = i;
+			}
+		} else {
+			stateToOutputMap = stateToOutputMapInput.get();
+			HMMStateCount = stateToOutputMap.getDimension();
+			Set<Integer> outputs = new LinkedHashSet<>();
+			for (Integer i : stateToOutputMap.getValues()) {
+				outputs.add(i);
+			}
+			HMMOutputCount = outputs.size();
+			// make sure outputmap contains numbers 0,...,HMMOutputCount-1 (only)
+			for (Integer i : outputs) {
+				if (i >= HMMStateCount || i < 0) {
+					throw new IllegalArgumentException("stateToOutputMap should only all values from 0 to #outputs - 1, (unlike " + i + ")");
+				}
+			}
+			map = new int [HMMStateCount];
+			for (int i = 0; i < HMMStateCount; i++) {
+				map[i] = stateToOutputMap.getValue(i);
+			}
+		}
+		
+		// sanity check
+		if (likelihoods.size() != HMMOutputCount) {
+			throw new IllegalArgumentException("Number of outputs (" + HMMOutputCount +") does not "
+					+ "match number of likelihoods (" + likelihoods.size() +")\n");
+		}
+		
 		if (stateLabelsInput.get() != null) {
 			stateLabels = stateLabelsInput.get().split(",");
-			if (stateLabels.length != HMMStateCount) {
-				throw new IllegalArgumentException("Number of state labels (" + stateLabels.length +") does not "
-						+ "match number of likelihoods (" + HMMStateCount +")\n");
-			}
 		} else {
 			stateLabels = new String[HMMStateCount];
 			for (int i = 0; i < HMMStateCount; i++) {
 				stateLabels[i] = "state" + i;
 			}
 		}
+		
+		// sanity check
+		if (stateLabels.length != HMMStateCount) {
+			throw new IllegalArgumentException("Number of labels (" + stateLabels.length +") does not "
+					+ "match number of states in HMM (" + HMMStateCount +")\n");
+		}
+		
+		
 		rates = ratesInput.get();
 		
 		// sanity checks
 		if (isDense && rates.getDimension() != HMMStateCount * HMMStateCount) {
-			throw new IllegalArgumentException("Dimension of rates should be " + (HMMStateCount * HMMStateCount) + " but is" + 
+			throw new IllegalArgumentException("Dimension of rates should be " + (HMMStateCount * HMMStateCount) + " but is " + 
 					rates.getDimension() + " or perhaps the number of likelihoods should be " + Math.sqrt(rates.getDimension()) +
 					" but is " + HMMStateCount);
 		}
@@ -122,10 +166,10 @@ public class PhyloHMM extends Distribution {
 			sitePatternIndex[i] = data.getPatternIndex(i);
 		}
 		HMMpartials = new double[siteCount][HMMStateCount];
-		patternLogP = new double[HMMStateCount][];
+		patternLogP = new double[HMMOutputCount][];
 		
 		patternCount = data.getPatternCount();
-		storedPatternLogP = new double[HMMStateCount][patternCount];
+		storedPatternLogP = new double[HMMOutputCount][patternCount];
 
         useThreads = useThreadsInput.get() && (BeastMCMC.m_nThreads > 1);
 		nrOfThreads = useThreads ? BeastMCMC.m_nThreads : 1;
@@ -146,7 +190,7 @@ public class PhyloHMM extends Distribution {
 		// collect pattern log likelihoods
 		int workAvailable = 0;
         if (useThreads) {
-    		for (int i = 0; i < HMMStateCount; i++) {
+    		for (int i = 0; i < HMMOutputCount; i++) {
     			if (likelihoods.get(i).isDirtyCalculation()) {
 	            	workAvailable++;
 	            }
@@ -155,7 +199,7 @@ public class PhyloHMM extends Distribution {
         if (useThreads && workAvailable > 1) {
             calculateUsingThreads(workAvailable);
         } else if (!useThreads || workAvailable > 0) {
-    		for (int i = 0; i < HMMStateCount; i++) {
+    		for (int i = 0; i < HMMOutputCount; i++) {
     			if (likelihoods.get(i).isDirtyCalculation()) {
     				likelihoods.get(i).calculateLogP();
     				patternLogP[i] = likelihoods.get(i).getPatternLogLikelihoods();
@@ -184,13 +228,13 @@ public class PhyloHMM extends Distribution {
         try {
             countDown = new CountDownLatch(dirtyDistrs);
             // kick off the threads
-    		for (int i = 0; i < HMMStateCount; i++) {
+    		for (int i = 0; i < HMMOutputCount; i++) {
     			if (likelihoods.get(i).isDirtyCalculation()) {
                     exec.execute(new Calculator(likelihoods.get(i)));
     			}
     		}
             countDown.await();
-    		for (int i = 0; i < HMMStateCount; i++) {
+    		for (int i = 0; i < HMMOutputCount; i++) {
     			if (likelihoods.get(i).isDirtyCalculation()) {
     				patternLogP[i] = likelihoods.get(i).getPatternLogLikelihoods();
     			}
@@ -223,17 +267,17 @@ public class PhyloHMM extends Distribution {
     } // CoreRunnable
     
 	void doForward(double[] freqs) {
-		double [][] patternP = new double[patternCount][HMMStateCount];
+		double [][] patternP = new double[patternCount][HMMOutputCount];
 		double [] patternLogScale = new double[patternCount];
 		double logScale = 0;
 
 		for (int k = 0; k < patternCount; k++) {
 			double max = 0;
-			for (int i = 0; i < HMMStateCount; i++) {
+			for (int i = 0; i < HMMOutputCount; i++) {
 				max = Math.max(max, patternLogP[i][k]);
 			}
 			patternLogScale[k] = max;
-			for (int i = 0; i < HMMStateCount; i++) {
+			for (int i = 0; i < HMMOutputCount; i++) {
 				patternP[k][i] = Math.exp(patternLogP[i][k] - max);
 			}
 		}
@@ -242,7 +286,7 @@ public class PhyloHMM extends Distribution {
 		double [] p0 = HMMpartials[0];
 		double [] P = patternP[sitePatternIndex[0]];
 		for (int i = 0; i < HMMStateCount; i++) {
-			p0[i] = freqs[i] * P[i];
+			p0[i] = freqs[i] * P[map[i]];
 		}
 		
 		double [] transitionRates = rates.getDoubleValues();
@@ -260,7 +304,7 @@ public class PhyloHMM extends Distribution {
 				for (int v = 0; v < HMMStateCount; v++) {
 					sum += transitionRates[u * HMMStateCount + v] * p0[v];
 				}
-				p1[u] = sum * P[u];
+				p1[u] = sum * P[map[u]];
 			}
 			// determine scale
 			double max = p1[0];
@@ -329,7 +373,7 @@ public class PhyloHMM extends Distribution {
 		double [] p0 = HMMpartials[0];
 		int siteIndex = sitePatternIndex[0];
 		for (int i = 0; i < HMMStateCount; i++) {
-			p0[i] = Math.log(freqs[i]) + patternLogP[i][siteIndex];
+			p0[i] = Math.log(freqs[i]) + patternLogP[map[i]][siteIndex];
 		}
 		
 		double [] transitionRates = rates.getDoubleValues();
@@ -355,7 +399,7 @@ public class PhyloHMM extends Distribution {
 						iMax = v;
 					}
 				}
-				p1[u] = max + patternLogP[u][siteIndex];
+				p1[u] = max + patternLogP[map[u]][siteIndex];
 				maxIndex[i][u] = iMax;
 			}
 		}
@@ -409,7 +453,7 @@ public class PhyloHMM extends Distribution {
 	public void store() {
 		super.store();
 		
-		for (int i = 0; i < HMMStateCount; i++) {
+		for (int i = 0; i < HMMOutputCount; i++) {
 			System.arraycopy(patternLogP[i], 0, storedPatternLogP[i], 0, patternCount);
 		}
 	}

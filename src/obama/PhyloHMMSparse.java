@@ -79,7 +79,7 @@ public class PhyloHMMSparse extends PhyloHMM {
 		double [] p0 = HMMpartials[0];
 		int siteIndex = sitePatternIndex[0];
 		for (int i = 0; i < HMMStateCount; i++) {
-			p0[i] = Math.log(freqs[i]) + patternLogP[i][siteIndex];
+			p0[i] = Math.log(freqs[i]) + patternLogP[map[i]][siteIndex];
 		}
 		
 		double [] transitionRates = rates.getDoubleValues();
@@ -108,7 +108,7 @@ public class PhyloHMMSparse extends PhyloHMM {
 				}
 			}
 			for (int u = 0; u < HMMStateCount; u++) {
-				p1[u] += patternLogP[u][siteIndex];
+				p1[u] += patternLogP[map[u]][siteIndex];
 			}			
 		}
 		
@@ -126,17 +126,17 @@ public class PhyloHMMSparse extends PhyloHMM {
 	
 	@Override
 	void doForward(double[] freqs) {
-		double [][] patternP = new double[patternCount][HMMStateCount];
+		double [][] patternP = new double[patternCount][HMMOutputCount];
 		double [] patternLogScale = new double[patternCount];
 		double logScale = 0;
 
 		for (int k = 0; k < patternCount; k++) {
 			double max = 0;
-			for (int i = 0; i < HMMStateCount; i++) {
+			for (int i = 0; i < HMMOutputCount; i++) {
 				max = Math.max(max, patternLogP[i][k]);
 			}
 			patternLogScale[k] = max;
-			for (int i = 0; i < HMMStateCount; i++) {
+			for (int i = 0; i < HMMOutputCount; i++) {
 				patternP[k][i] = Math.exp(patternLogP[i][k] - max);
 			}
 		}
@@ -145,7 +145,7 @@ public class PhyloHMMSparse extends PhyloHMM {
 		double [] p0 = HMMpartials[0];
 		double [] P = patternP[sitePatternIndex[0]];
 		for (int i = 0; i < HMMStateCount; i++) {
-			p0[i] = freqs[i] * P[i];
+			p0[i] = freqs[i] * P[map[i]];
 		}
 		
 		double [] transitionRates = rates.getDoubleValues();
@@ -166,7 +166,7 @@ public class PhyloHMMSparse extends PhyloHMM {
 				p1[u] += transitionRates[j] * p0[v];
 			}
 			for (int u = 0; u < HMMStateCount; u++) {
-				p1[u] = p1[u] * P[u];
+				p1[u] = p1[u] * P[map[u]];
 			}
 
 			// determine scale

@@ -163,7 +163,7 @@ id="primate-mtDNA">
     </logger>
 
     <logger id="tracelog2" fileName="primate-mtDNA-phyloHMM.log" logEvery="10000">
-    	<log spec="obama.PhyloHMMLogger" phyloHMM="@PhyloHMM"/>
+    	<log id="site" spec="obama.PhyloHMMLogger" phyloHMM="@PhyloHMM"/>
     </logger>
 </run>
 
