@@ -15,6 +15,7 @@ import java.util.concurrent.RejectedExecutionException;
 import beast.app.BeastMCMC;
 import beast.core.Description;
 import beast.core.Distribution;
+import beast.core.Function;
 import beast.core.Input;
 import beast.core.Input.Validate;
 import beast.core.State;
@@ -31,7 +32,7 @@ public class PhyloHMM extends Distribution {
 			"treelikelihood, one for each state", 
 			new ArrayList<>(), Validate.REQUIRED);
 	final public Input<Frequencies> freqsInput = new Input<>("frequencies", "start frequencies for the HMM. Assumed uniform if not specified");
-	final public Input<RealParameter> ratesInput = new Input<>("rates", "rates for HMM transition probabilities", Validate.REQUIRED);
+	final public Input<Function> ratesInput = new Input<>("rates", "rates for HMM transition probabilities", Validate.REQUIRED);
 	
 	enum hmmAlgorithm {Viterbi, backwardforward};
 	final public Input<hmmAlgorithm> hmmAlgorithmInput = new Input<>("HMMAlgorithm", "which HMM algorithm to use "
@@ -58,7 +59,7 @@ public class PhyloHMM extends Distribution {
 	double [][] storedPatternLogP;
 	
 	Alignment data;
-	RealParameter rates;
+	Function rates;
 	
 	Frequencies frequencies;
 	int [][] maxIndex = null;
@@ -469,6 +470,12 @@ public class PhyloHMM extends Distribution {
 
 	@Override
 	protected boolean requiresRecalculation() {
+		if (stateToOutputMap != null && stateToOutputMap.somethingIsDirty()) {
+			// assume number of states does not change!
+			for (int i = 0; i < HMMStateCount; i++) {
+				map[i] = stateToOutputMap.getValue(i);
+			}
+		}
 		return super.requiresRecalculation();
 	}
 	

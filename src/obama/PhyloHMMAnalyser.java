@@ -66,11 +66,12 @@ public class PhyloHMMAnalyser extends Runnable {
 		
 		
 		StringBuilder svg = new StringBuilder();
-		svg.append("<svg width=\"" + (n + 100) + "\" height=\"" + (traceCount + 100) + "\">\n");
+		svg.append("<svg width=\"" + (n + 100) + "\" height=\"" + (traceCount + 30 + stateCount * 25) + "\">\n");
 		svg.append("<style  type=\"text/css\">\n");
 		for (int i = 0; i < stateCount; i++) {
 			Color color = new Color(Color.HSBtoRGB(((float) i)/stateCount, 0.9f, 0.9f));
-			svg.append(".state" + i + " {fill:rgb(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + ")}\n");
+			svg.append(".state" + i + " {fill:rgb(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + ");"
+					+ "stroke:rgb(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + ")}\n");
 		}
 		svg.append(".ticktext {font: bold 8px}\n");
 		svg.append("</style>\n");
@@ -94,7 +95,19 @@ public class PhyloHMMAnalyser extends Runnable {
 					+ " style=\"stroke-width:1;stroke:rgb(0,0,0)\"/>\n");
 			svg.append("<text x=\"" + (10 + i) + "\" y=\"" + (35 + traceCount) + "\" class=\"ticktext\" text-anchor=\"middle\">" + i +"</text>\n");
 		}
-
+		// labels
+		String [] label = new String[stateCount];
+		for (int i = 0; i < stateCount; i++) {
+			label[i] = "state " + i;
+		}
+		for (int i = 0; i < stateCount; i++) {
+			int y = (45 + traceCount + 25 * i);
+			svg.append("<rect x=\"10\" y=\"" + y + "\" width=\"80\" height=\"1\" class=\"state" + i + "\" "
+					+ " style=\"stroke-width:3;\"/>\n");
+			svg.append("<text x=\"100\" y=\"" + (y + 5) + "\" class=\"ticktext\">" + label[i] +"</text>\n");
+		}
+		
+		
 		// content
 		int x = 10;
 		for (int i = 0; i < n; i++) {

@@ -47,26 +47,18 @@ id="primate-mtDNA">
             <taxonset id="taxonSet" spec="TaxonSet" alignment="@primate-mtDNA"/>
         </tree>
         <parameter id="birthRate.t:tree" name="stateNode">1.0</parameter>
-      	<plate var="n" range="1,2,3,4">
+      	<plate var="n" range="1,2,3">
 	        <parameter id="kappa.s:state$(n)" lower="0.0" name="stateNode">2.0</parameter>
 	        <parameter id="mutationRate.s:state$(n)" name="stateNode">1.0</parameter>
     	    <parameter id="freqParameter.s:state$(n)" dimension="4" lower="0.0" name="stateNode" upper="1.0">0.25</parameter>
     	</plate>
         
-        <!-- toy gene finder from Example 1 in 
+        <!-- highly conserved region finder from Example 2 in 
         	Siepel, Adam, and David Haussler. 
 	        "Phylogenetic hidden Markov models." 
     	    Statistical methods in molecular evolution. 
         	Springer New York, 2005. 325-351. -->
-        <parameter id="HMMRates" lower="0.0" name="stateNode" value="
-        	0.9999   0   0    0.011 
-        	0.0001   0   0    0.989
-        	0        1   0    0
-        	0        0   1    0
-        	"/>
-        <!-- column = origin state -->
-        <!-- row    = target state -->
-        <!-- states: NC, codon position 1, codon position 2, codon position 3 -->
+        <parameter name="stateNode" id="lambda" lower="0.0" upper="1.0" value="0.5"/>
     </state>
 
     <init id="RandomTree.t:tree" spec="beast.evolution.tree.RandomTree" estimate="false" initial="@Tree.t:tree" taxa="@primate-mtDNA">
@@ -83,7 +75,7 @@ id="primate-mtDNA">
             </prior>
             
             
-        	<plate var="n" range="1,2,3,4">
+        	<plate var="n" range="1,2,3">
 	            <prior id="KappaPrior.s:state$(n)" name="distribution" x="@kappa.s:state$(n)">
     	            <LogNormal id="LogNormalDistributionModel.0.state$(n)" name="distr" M="1.0" S="1.25"/>
 	            </prior>
@@ -92,7 +84,7 @@ id="primate-mtDNA">
         </distribution>
         <distribution id="likelihood" spec="util.CompoundDistribution" useThreads="true">
 			<distribution spec="obama.PhyloHMM" id="PhyloHMM">        
-	        	<plate var="n" range="1,2,3,4">
+	        	<plate var="n" range="1,2,3">
     	    	    <treelikelihood id="treeLikelihood.state$(n)" spec="TreeLikelihood" data="@primate-mtDNA"  branchRateModel="@StrictClock.c:clock" tree="@Tree.t:tree">
         	    	    <siteModel id="SiteModel.s:state$(n)" spec="SiteModel" mutationRate="@mutationRate.s:state$(n)">
                     	<parameter id="gammaShape.s:state$(n)" estimate="false" name="shape">1.0</parameter>
@@ -103,11 +95,14 @@ id="primate-mtDNA">
         		        </siteModel>
 		            </treelikelihood>
         	    </plate>
-        	    <rates idref="HMMRates"/>
+        	    <rates id="HMMRates" spec="obama.RatesForConservedRegions" lambda="@lambda" stateCount="3"/>
         	</distribution>
 
         </distribution>
     </distribution>
+
+    <operator id="lambdaRateScaler.t:tree" spec="ScaleOperator" parameter="@lambda" scaleFactor="0.75" weight="1.0"/>
+
 
     <operator id="YuleBirthRateScaler.t:tree" spec="ScaleOperator" parameter="@birthRate.t:tree" scaleFactor="0.75" weight="3.0"/>
 
@@ -125,7 +120,7 @@ id="primate-mtDNA">
 
     <operator id="YuleModelWilsonBalding.t:tree" spec="WilsonBalding" tree="@Tree.t:tree" weight="3.0"/>
 
-    <plate var="n" range="1,2,3,4">
+    <plate var="n" range="1,2,3">
     	<operator id="KappaScaler.s:state$(n)" spec="ScaleOperator" parameter="@kappa.s:state$(n)" scaleFactor="0.5" weight="0.1"/>
 	    <operator id="FrequenciesExchanger.s:state$(n)" spec="DeltaExchangeOperator" delta="0.01" weight="0.1">
     	    <parameter idref="freqParameter.s:state$(n)"/>
@@ -133,27 +128,28 @@ id="primate-mtDNA">
 	</plate>
 
     <operator id="FixMeanMutationRatesOperator" spec="DeltaExchangeOperator" delta="0.75" weight="2.0">
-    	<plate var="n" range="1,2,3,4">
+    	<plate var="n" range="1,2,3">
 	        <parameter idref="mutationRate.s:state$(n)"/>
         </plate>
     </operator>
 
 
 
-    <logger id="tracelog" fileName="primate-mtDNA.log" logEvery="10000" model="@posterior" sanitiseHeaders="true" sort="smart">
+    <logger id="tracelog" fileName="conservedRegions.log" logEvery="10000" model="@posterior" sanitiseHeaders="true" sort="smart">
         <log idref="posterior"/>
         <log idref="likelihood"/>
         <log idref="prior"/>
         <log id="TreeHeight.t:tree" spec="beast.evolution.tree.TreeHeightLogger" tree="@Tree.t:tree"/>
         <log idref="YuleModel.t:tree"/>
         <log idref="birthRate.t:tree"/>
-	    <plate var="n" range="1,2,3,4">
+	    <plate var="n" range="1,2,3">
     	    <log idref="treeLikelihood.state$(n)"/>
         	<log idref="kappa.s:state$(n)"/>
 	        <log idref="mutationRate.s:state$(n)"/>
     	    <log idref="freqParameter.s:state$(n)"/>
         </plate>
         <log idref="PhyloHMM"/>
+        <log idref="lambda"/>
     </logger>
 
     <logger id="screenlog" logEvery="10000">
@@ -163,11 +159,11 @@ id="primate-mtDNA">
         <log idref="prior"/>
     </logger>
 
-    <logger id="treelog.t:tree" fileName="primate-mtDNA.trees" logEvery="10000" mode="tree">
+    <logger id="treelog.t:tree" fileName="conservedRegions.trees" logEvery="10000" mode="tree">
         <log id="TreeWithMetaDataLogger.t:tree" spec="beast.evolution.tree.TreeWithMetaDataLogger" tree="@Tree.t:tree"/>
     </logger>
 
-    <logger id="tracelog2" fileName="primate-mtDNA-phyloHMM.log" logEvery="10000">
+    <logger id="tracelog2" fileName="conservedRegions-phyloHMM.log" logEvery="10000">
     	<log id="site" spec="obama.PhyloHMMLogger" phyloHMM="@PhyloHMM"/>
     </logger>
 </run>
