@@ -140,16 +140,21 @@ public class PhyloHMMAnalyser extends Runnable {
 		}
 		svg.append("</svg>");
 
-		String instance = "0";
-		String jsPath = "/tmp";
+		String jsPath = getJavaScriptPath();
+
+        String html = "<!DOCTYPE html>\n<html>\n<body>\n" + 
+        		svg.toString() + 
+        		"</body>\n</html>";
+        openPage(html, jsPath, "0");
+		
 		if (phyloHMM != null) {
 			String dotty = toDotty(label);
 			String dotty2 = dotty;
 			dotty2 = dotty2.replaceAll("\n", "\\\\\n");
 			dotty2 = dotty2.replaceAll("'", "&quot;");
 			
-			jsPath = getJavaScriptPath();
-			String html = "<html>\n" + 
+			
+			 html = "<html>\n" + 
 					"<title>BEAST " + new BEASTVersion2().getVersionString() + ": Phylo-HMM-Analyser</title>\n" +
 					"<header>\n" + 
 					"<link rel='stylesheet' type='text/css' href='css/style.css'>\n" +
@@ -211,36 +216,31 @@ public class PhyloHMMAnalyser extends Runnable {
 					"});\n" + 
 					"</script>\n" + 
 					"\n" + 
-					svg.toString() +
 					"</body>\n" +
 					"</html>";
+			 
+			 // save dotty file
 			try {
-		        FileWriter outfile = new FileWriter(jsPath + "/PhyloHMM" + instance + ".html");
-		        outfile.write(html);
-		        outfile.close();
-		        
-		        outfile = new FileWriter("/tmp/p.dot");
+		        FileWriter outfile = new FileWriter(jsPath + "/p.dot");
 		        outfile.write(dotty);
 		        outfile.close();
+		        Log.warning("Dotty file written in: " + jsPath + "/p.dot");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		} else {
-		
-			jsPath = "/tmp";
-			
-			try {
-		        FileWriter outfile = new FileWriter(jsPath + "/PhyloHMM" + instance + ".html");
-		        outfile.write("<!DOCTYPE html>\n<html>\n<body>");
-		        outfile.write(svg.toString());
-		        outfile.write("</body>\n</html>");
-		        outfile.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+	        openPage(html, jsPath, "1");
 		}
-		
+	}
+	
+	private void openPage(String html, String jsPath, String instance) {
+		try {
+	        FileWriter outfile = new FileWriter(jsPath + "/PhyloHMM" + instance + ".html");
+	        outfile.write(html);
+	        outfile.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		if (useBrowseInput.get()) {
 			try {
 				openUrl("file://" + jsPath + "/PhyloHMM" + instance + ".html");
