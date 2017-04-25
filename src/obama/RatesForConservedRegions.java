@@ -1,14 +1,17 @@
 package obama;
 
+import java.io.PrintStream;
+
 import beast.core.CalculationNode;
 import beast.core.Description;
 import beast.core.Function;
 import beast.core.Input;
 import beast.core.Input.Validate;
+import beast.core.Loggable;
 import beast.core.parameter.RealParameter;
 
 @Description("HMM rate matrix for Example 2 in Siepel, A. and Haussler, D., 2005. Phylogenetic hidden Markov models. In Statistical methods in molecular evolution (pp. 325-351). Springer New York.")
-public class RatesForConservedRegions extends CalculationNode implements Function {
+public class RatesForConservedRegions extends CalculationNode implements Function, Loggable {
 	public Input<RealParameter> lambdaInput = new Input<>("lambda","auto correlation parameter lambda", Validate.REQUIRED);
 	public Input<Integer> states = new Input<>("stateCount", "number of states k. Rates between states are (1.0-lambda)/k and rates to stay in states are lambda + (1.0-lambda)/k", 3);
 
@@ -27,7 +30,8 @@ public class RatesForConservedRegions extends CalculationNode implements Functio
 
 	private void update() {
 		double b = (1.0 - lambda.getValue()) / k;
-		double a = lambda.getValue() + (k-1) * (1.0 - lambda.getValue()) / k;
+//		double a = lambda.getValue() + (k-1) * (1.0 - lambda.getValue()) / k;
+		double a = lambda.getValue() + (1.0 - lambda.getValue()) / k;
 
 		int u = 0;
 		for (int i = 0; i < k; i++) {
@@ -79,5 +83,23 @@ public class RatesForConservedRegions extends CalculationNode implements Functio
 	protected boolean requiresRecalculation() {
 		needsUpdate = true;
 		return super.requiresRecalculation();
+	}
+
+	@Override
+	public void init(PrintStream out) {
+		for (int i = 0; i < rates.length; i++) {
+			out.append(getID() + i + "\t");
+		}
+	}
+
+	@Override
+	public void log(int sample, PrintStream out) {
+		for (int i = 0; i < rates.length; i++) {
+			out.append(rates[i] + "\t");
+		}
+	}
+
+	@Override
+	public void close(PrintStream out) {		
 	}
 }

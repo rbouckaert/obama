@@ -222,4 +222,8 @@ public class PhyloHMMSparse extends PhyloHMM {
 	}
 	
 
+	@Override
+	public int[] getLink(int i) {
+		return new int[]{from[i], to[i]};
+	}
 }

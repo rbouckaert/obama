@@ -91,7 +91,7 @@ id="primate-mtDNA">
 
         </distribution>
         <distribution id="likelihood" spec="util.CompoundDistribution" useThreads="true">
-			<distribution spec="obama.PhyloHMM" id="PhyloHMM">        
+			<distribution spec="obama.PhyloHMM" id="PhyloHMM" stateLabels="NC,codon1,codon2,codon3">        
 	        	<plate var="n" range="1,2,3,4">
     	    	    <treelikelihood id="treeLikelihood.state$(n)" spec="TreeLikelihood" data="@primate-mtDNA"  branchRateModel="@StrictClock.c:clock" tree="@Tree.t:tree">
         	    	    <siteModel id="SiteModel.s:state$(n)" spec="SiteModel" mutationRate="@mutationRate.s:state$(n)">

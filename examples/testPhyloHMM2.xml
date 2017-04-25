@@ -165,6 +165,7 @@ id="primate-mtDNA">
 
     <logger id="tracelog2" fileName="conservedRegions-phyloHMM.log" logEvery="10000">
     	<log id="site" spec="obama.PhyloHMMLogger" phyloHMM="@PhyloHMM"/>
+    	<log idref="HMMRates"/>
     </logger>
 </run>
 

@@ -478,5 +478,11 @@ public class PhyloHMM extends Distribution {
 		}
 		return super.requiresRecalculation();
 	}
+
+
+	/** return source and target index for the ith rate **/
+	public int[] getLink(int i) {
+		return new int[]{i % HMMStateCount, i / HMMStateCount};
+	}
 	
 } // phyloHMM
