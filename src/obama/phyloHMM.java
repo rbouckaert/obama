@@ -1,16 +1,23 @@
 package obama;
 
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 
+import beast.app.BeastMCMC;
 import beast.core.Description;
 import beast.core.Distribution;
 import beast.core.Input;
 import beast.core.Input.Validate;
 import beast.core.State;
 import beast.core.parameter.RealParameter;
+import beast.core.util.Log;
 import beast.evolution.alignment.Alignment;
 import beast.evolution.likelihood.TreeLikelihood;
 import beast.evolution.substitutionmodel.Frequencies;
@@ -28,6 +35,11 @@ public class PhyloHMM extends Distribution {
 			+ "", hmmAlgorithm.Viterbi, hmmAlgorithm.values());
 	
 	final public Input<String> stateLabelsInput = new Input<>("stateLabels", "comma separated list of labels for each of the states in the HMM");
+
+	// threading
+    final public Input<Boolean> useThreadsInput = new Input<>("useThreads", "calculated the distributions in parallel using threads (default true)", true);
+    final public Input<Integer> maxNrOfThreadsInput = new Input<>("threads","maximum number of threads to use, if less than 1 the number of threads in BeastMCMC is used (default -1)", -1);
+
 	
 	int siteCount, patternCount;
 	/** sitePatternIndex[siteCount] maps site index to pattern index **/
@@ -48,8 +60,14 @@ public class PhyloHMM extends Distribution {
 	
 	String [] stateLabels;
 	
+	// is the rate matrix for HMM dense or sparse
 	boolean isDense = true;
 	
+	// threading related members
+    boolean useThreads;
+    int nrOfThreads;
+    ExecutorService exec;
+
 	@Override
 	public void initAndValidate() {
 		likelihoods = likelihoodsInput.get();
@@ -108,6 +126,16 @@ public class PhyloHMM extends Distribution {
 		
 		patternCount = data.getPatternCount();
 		storedPatternLogP = new double[HMMStateCount][patternCount];
+
+        useThreads = useThreadsInput.get() && (BeastMCMC.m_nThreads > 1);
+		nrOfThreads = useThreads ? BeastMCMC.m_nThreads : 1;
+		if (useThreads && maxNrOfThreadsInput.get() > 0) {
+			nrOfThreads = Math.min(maxNrOfThreadsInput.get(), BeastMCMC.m_nThreads);
+		}
+		if (useThreads) {
+		     exec = Executors.newFixedThreadPool(nrOfThreads);
+		}
+	
 	}
 	
 	
@@ -116,12 +144,25 @@ public class PhyloHMM extends Distribution {
 		logP = 0;
 		
 		// collect pattern log likelihoods
-		for (int i = 0; i < HMMStateCount; i++) {
-			if (likelihoods.get(i).isDirtyCalculation()) {
-				likelihoods.get(i).calculateLogP();
-				patternLogP[i] = likelihoods.get(i).getPatternLogLikelihoods();
-			}
-		}
+		int workAvailable = 0;
+        if (useThreads) {
+    		for (int i = 0; i < HMMStateCount; i++) {
+    			if (likelihoods.get(i).isDirtyCalculation()) {
+	            	workAvailable++;
+	            }
+	        }
+        }
+        if (useThreads && workAvailable > 1) {
+            calculateUsingThreads(workAvailable);
+        } else if (!useThreads || workAvailable > 0) {
+    		for (int i = 0; i < HMMStateCount; i++) {
+    			if (likelihoods.get(i).isDirtyCalculation()) {
+    				likelihoods.get(i).calculateLogP();
+    				patternLogP[i] = likelihoods.get(i).getPatternLogLikelihoods();
+    			}
+    		}
+        }
+		
 		
 		double [] freqs = frequencies.getFreqs();
 		
@@ -137,8 +178,50 @@ public class PhyloHMM extends Distribution {
 		return logP;
 	}
 	
-	
-	
+    CountDownLatch countDown;
+
+    private void calculateUsingThreads(int dirtyDistrs) {
+        try {
+            countDown = new CountDownLatch(dirtyDistrs);
+            // kick off the threads
+    		for (int i = 0; i < HMMStateCount; i++) {
+    			if (likelihoods.get(i).isDirtyCalculation()) {
+                    exec.execute(new Calculator(likelihoods.get(i)));
+    			}
+    		}
+            countDown.await();
+    		for (int i = 0; i < HMMStateCount; i++) {
+    			if (likelihoods.get(i).isDirtyCalculation()) {
+    				patternLogP[i] = likelihoods.get(i).getPatternLogLikelihoods();
+    			}
+    		}
+        } catch (RejectedExecutionException | InterruptedException e) {
+            useThreads = false;
+            Log.err.println("Stop using threads: " + e.getMessage());
+        }
+    }
+
+    class Calculator implements Runnable {
+        Distribution distr;
+
+        Calculator(Distribution distr) {
+            this.distr = distr;
+        }
+
+        @Override
+		public void run() {
+            try {
+                distr.calculateLogP();
+            } catch (Exception e) {
+                Log.err.println("Something went wrong in a calculation of " + distr.getID());
+                e.printStackTrace();
+                System.exit(1);
+            }
+            countDown.countDown();
+        }
+
+    } // CoreRunnable
+    
 	void doForward(double[] freqs) {
 		double [][] patternP = new double[patternCount][HMMStateCount];
 		double [] patternLogScale = new double[patternCount];
