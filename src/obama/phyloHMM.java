@@ -270,7 +270,6 @@ public class PhyloHMM extends Distribution {
 	void doForward(double[] freqs) {
 		double [][] patternP = new double[patternCount][HMMOutputCount];
 		double [] patternLogScale = new double[patternCount];
-		double logScale = 0;
 
 		for (int k = 0; k < patternCount; k++) {
 			double max = 0;
@@ -290,16 +289,33 @@ public class PhyloHMM extends Distribution {
 			p0[i] = freqs[i] * P[map[i]];
 		}
 		
+		double logScale = doForwardLoop(patternP);
+		
+		double totalP = 0;
+		double [] p1 = HMMpartials[siteCount - 1];
+		for (int u = 0; u < HMMStateCount; u++) {
+			totalP += p1[u];
+		}
+		logP = Math.log(totalP) + logScale;
+		int [] weights = data.getWeights();
+		for (int i = 0; i < patternCount; i++) {
+			logP += patternLogScale[i] * weights[i];
+		}
+
+	}
+
+	double doForwardLoop(double [][] patternP) {
+		double logScale = 0;
+
 		double [] transitionRates = rates.getDoubleValues();
-		double [] p1;
 		
 		// forward
 		for (int i = 1; i < siteCount; i++) {
 			
-			p0 = HMMpartials[i - 1];
-			p1 = HMMpartials[i];
+			double [] p0 = HMMpartials[i - 1];
+			double [] p1 = HMMpartials[i];
 			
-			P = patternP[sitePatternIndex[i]];
+			double [] P = patternP[sitePatternIndex[i]];
 			for (int u = 0; u < HMMStateCount; u++) {
 				double sum = 0;
 				for (int v = 0; v < HMMStateCount; v++) {
@@ -317,19 +333,9 @@ public class PhyloHMM extends Distribution {
 			}
 			logScale += Math.log(max);
 		}
-		
-		
-		double totalP = 0;
-		p1 = HMMpartials[siteCount - 1];
-		for (int u = 0; u < HMMStateCount; u++) {
-			totalP += p1[u];
-		}
-		logP = Math.log(totalP) + logScale;
-		int [] weights = data.getWeights();
-		for (int i = 0; i < patternCount; i++) {
-			logP += patternLogScale[i] * weights[i];
-		}
+		return logScale;
 	}
+
 
 	/** calc state distributions in backward sweep **/
 	void backward() {
@@ -382,6 +388,23 @@ public class PhyloHMM extends Distribution {
 		for (int i = 0; i < transitionRates.length; i++) {
 			transitionRates[i] = Math.log(transitionRates[i]);
 		}
+		
+		doViterbiLoop(transitionRates);
+		
+		double [] p1 = HMMpartials[siteCount - 1];
+		double max = Double.NEGATIVE_INFINITY;
+		int iMax = -1;
+		for (int v = 0; v < HMMStateCount; v++) {
+			if (p1[v] > max) {
+				max = p1[v];
+				iMax = v;
+			}
+		}
+		logP = p1[iMax];
+	}
+	
+	void doViterbiLoop(double[] transitionRates) {
+		double [] p0;
 		double [] p1;
 		
 		// forward
@@ -390,7 +413,7 @@ public class PhyloHMM extends Distribution {
 			p0 = HMMpartials[i - 1];
 			p1 = HMMpartials[i];
 			
-			siteIndex = sitePatternIndex[i];
+			int siteIndex = sitePatternIndex[i];
 			for (int u = 0; u < HMMStateCount; u++) {
 				double max = Double.NEGATIVE_INFINITY;
 				int iMax = -1;
@@ -405,18 +428,9 @@ public class PhyloHMM extends Distribution {
 			}
 		}
 		
-		p1 = HMMpartials[siteCount - 1];
-		double max = Double.NEGATIVE_INFINITY;
-		int iMax = -1;
-		for (int v = 0; v < HMMStateCount; v++) {
-			if (p1[v] > max) {
-				max = p1[v];
-				iMax = v;
-			}
-		}
-		logP = p1[iMax];
 	}
-	
+
+
 	void backwardViterbi() {
 		// backward
 		int [] path = new int[siteCount];
