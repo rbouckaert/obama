@@ -16,22 +16,31 @@ public class PhyloHMMSparse extends PhyloHMM {
 	
 	int [] from;
 	int [] to;
-	
+		
 	public PhyloHMMSparse() {
-		isDense = false;
 	}
 	
 	@Override
 	public void initAndValidate() {
-		List<Transition> transitions = transitionsInput.get();		
-		if (transitions.size() != ratesInput.get().getDimension()) {
-			throw new IllegalArgumentException("Number of transitions (" + transitions.size()+ ") "
-					+ "should be same as dimension of rates (" + ratesInput.get().getDimension() + ")");
+		List<Transition> transitions = transitionsInput.get();
+		isDense = (transitions.size() == 0);
+		if (!isDense) {
+			if (transitions.size() != ratesInput.get().getDimension()) {
+				throw new IllegalArgumentException("Number of transitions (" + transitions.size()+ ") "
+						+ "should be same as dimension of rates (" + ratesInput.get().getDimension() + ")");
+			}
 		}
 
 		super.initAndValidate();
 		
-		// set up from/to arrays
+		if (!isDense) {
+			setUpTransitions();
+		}
+	}
+	
+	// set up from/to arrays based on transitionsInput
+	void setUpTransitions() {
+		List<Transition> transitions = transitionsInput.get();
 
 		Map<String, Integer> map = new LinkedHashMap<>();
 		if (stateLabelsInput.get() != null) {
@@ -73,6 +82,11 @@ public class PhyloHMMSparse extends PhyloHMM {
 	/** sparse implementation of forward Viterbi **/
 	@Override
 	void doViterbiLoop(double[] transitionRates) {
+		if (isDense) {
+			super.doViterbiLoop(transitionRates);
+			return;
+		}
+
 		// forward
 		for (int i = 1; i < siteCount; i++) {
 			
@@ -99,6 +113,10 @@ public class PhyloHMMSparse extends PhyloHMM {
 	
 	@Override
 	double doForwardLoop(double[][] patternP) {
+		if (isDense) {
+			return super.doForwardLoop(patternP);			
+		}
+		
 		double logScale = 0;
 		double [] transitionRates = rates.getDoubleValues();
 		
@@ -136,6 +154,11 @@ public class PhyloHMMSparse extends PhyloHMM {
 	/** calc state distributions in backward sweep **/
 	@Override
 	void backward() {
+		if (isDense) {
+			super.backward();
+			return;
+		}
+
 		double [] transitionRates = rates.getDoubleValues();
 		normalise(HMMpartials[siteCount - 1]);
 		
@@ -164,6 +187,9 @@ public class PhyloHMMSparse extends PhyloHMM {
 
 	@Override
 	public int[] getLink(int i) {
+		if (isDense) {			
+			return super.getLink(i);
+		}
 		return new int[]{from[i], to[i]};
 	}
 }
