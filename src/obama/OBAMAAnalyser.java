@@ -91,6 +91,7 @@ public class OBAMAAnalyser extends Runnable {
 
 			}
 		}
+		Log.info("Done");
 	}
 
 	private void getObjets(BEASTInterface bi, Set<Object> objects) {

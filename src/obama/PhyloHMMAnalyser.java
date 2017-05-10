@@ -42,6 +42,7 @@ public class PhyloHMMAnalyser extends Runnable {
 	public Input<Boolean> useBrowseInput = new Input<>("useBrowserForVisualisation", "use default web browser for visualising the output. "
 			+ "Since not all browsers support all features, the alternative is to use an internal viewer, which requires an up to date Java 8 version.", true);
 	public Input<XMLFile> xmlFileInput = new Input<>("xml", "XML file specifying the set of models. If specified, labels will be sourced from the XML file.");
+	public Input<Integer> maxHeightInput = new Input<>("maxHeight", "maximum height of plot: if negative take number of samples in trace log as height (default -1)" , -1);
 
 	@Override
 	public void initAndValidate() {
@@ -79,11 +80,15 @@ public class PhyloHMMAnalyser extends Runnable {
 		}
 		int stateCount = (int) (max + 1.5);
 		int traceCount = analyser.getTrace(0).length;
+		int plotHeight = traceCount;
+		if (traceCount > maxHeightInput.get() && maxHeightInput.get() > 0) {
+			plotHeight = maxHeightInput.get();
+		}
 		Log.warning(n + " sites with " + stateCount + " states " + traceCount + " samples");
 		
 		
 		StringBuilder svg = new StringBuilder();
-		svg.append("<svg width=\"" + (n + 100) + "\" height=\"" + (traceCount + 30 + stateCount * 25) + "\">\n");
+		svg.append("<svg width=\"" + (n + 100) + "\" height=\"" + (plotHeight + 30 + stateCount * 25) + "\">\n");
 		svg.append("<style  type=\"text/css\">\n");
 		for (int i = 0; i < stateCount; i++) {
 			Color color = new Color(Color.HSBtoRGB(((float) i)/stateCount, 0.9f, 0.9f));
@@ -94,28 +99,28 @@ public class PhyloHMMAnalyser extends Runnable {
 		svg.append("</style>\n");
 		
 		// bounding box
-		svg.append("<rect x=\"9\" y=\"9\" width=\"" + (n + 2) + "\" height=\"" + (traceCount + 2) + "\" style=\"stroke-width:2;stroke:rgb(0,0,0)\"/>\n");
+		svg.append("<rect x=\"9\" y=\"9\" width=\"" + (n + 2) + "\" height=\"" + (plotHeight + 2) + "\" style=\"stroke-width:2;stroke:rgb(0,0,0)\"/>\n");
 
 		// ticks
 		for (int i = 10; i < n; i += 10) {
 			if (i % 50 != 0) {
-				svg.append("<line x1=\"" + (10 + i) + "\" y1=\"" + (10 + traceCount) + "\" x2=\"" + (10 + i) + "\" y2=\"" + (14 + traceCount) + "\" "
+				svg.append("<line x1=\"" + (10 + i) + "\" y1=\"" + (10 + plotHeight) + "\" x2=\"" + (10 + i) + "\" y2=\"" + (14 + plotHeight) + "\" "
 					+ " style=\"stroke-width:1;stroke:rgb(0,0,0)\"/>\n");
 			}
 		}
 		for (int i = 50; i < n; i += 100) {
-			svg.append("<line x1=\"" + (10 + i) + "\" y1=\"" + (10 + traceCount) + "\" x2=\"" + (10 + i) + "\" y2=\"" + (17 + traceCount) + "\" "
+			svg.append("<line x1=\"" + (10 + i) + "\" y1=\"" + (10 + plotHeight) + "\" x2=\"" + (10 + i) + "\" y2=\"" + (17 + plotHeight) + "\" "
 					+ " style=\"stroke-width:1;stroke:rgb(0,0,0)\"/>\n");
 		}
 		for (int i = 0; i < n; i += 100) {
-			svg.append("<line x1=\"" + (10 + i) + "\" y1=\"" + (10 + traceCount) + "\" x2=\"" + (10 + i) + "\" y2=\"" + (20 + traceCount) + "\" "
+			svg.append("<line x1=\"" + (10 + i) + "\" y1=\"" + (10 + plotHeight) + "\" x2=\"" + (10 + i) + "\" y2=\"" + (20 + plotHeight) + "\" "
 					+ " style=\"stroke-width:1;stroke:rgb(0,0,0)\"/>\n");
-			svg.append("<text x=\"" + (10 + i) + "\" y=\"" + (35 + traceCount) + "\" class=\"ticktext\" text-anchor=\"middle\">" + i +"</text>\n");
+			svg.append("<text x=\"" + (10 + i) + "\" y=\"" + (35 + plotHeight) + "\" class=\"ticktext\" text-anchor=\"middle\">" + i +"</text>\n");
 		}
 		// labels
 		String [] label = getLabels(stateCount);
 		for (int i = 0; i < stateCount; i++) {
-			int y = (45 + traceCount + 25 * i);
+			int y = (45 + plotHeight + 25 * i);
 			svg.append("<rect x=\"10\" y=\"" + y + "\" width=\"50\" height=\"1\" class=\"state" + i + "\" "
 					+ " style=\"stroke-width:3;\"/>\n");
 			svg.append("<text x=\"100\" y=\"" + (y + 5) + "\" class=\"ticktext\" text-anchor=\"start\">" + label[i] +"</text>\n");
@@ -124,16 +129,17 @@ public class PhyloHMMAnalyser extends Runnable {
 		
 		// content
 		int x = 10;
+		double scale = ((double) plotHeight) / traceCount;
 		for (int i = 0; i < n; i++) {
 			int [] count = new int[stateCount];
 			for (Double d : analyser.getTrace(prefix + i)) {
 				count[(int)(d + 0.5)]++;
 			}
-			int y = 10;
+			double y = 10;
 			for (int j = 0; j < stateCount; j++) {
 				if (count[j] > 0) {
-					svg.append("<rect x=\"" + x + "\" y=\"" + y + "\" width=\"1\" height=\"" + count[j] + "\" class=\"state" + j + "\"/>\n");
-					y += count[j];
+					svg.append("<rect x=\"" + x + "\" y=\"" + y + "\" width=\"1\" height=\"" + count[j] * scale + "\" class=\"state" + j + "\"/>\n");
+					y += count[j] * scale;
 				}
 			}
 			x++;
