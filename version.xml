@@ -1,4 +1,4 @@
-<addon name='OBAMA' version='0.0.1' description="OBAMA Bayesian Amino-acid Model Averaging">
+<addon name='OBAMA' version='0.0.2' description="OBAMA Bayesian Amino-acid Model Averaging">
 	<depends on='beast2' atleast='2.4.0'/>
     <depends on='bModelTest' atleast='1.0.3'/>
     <depends on='BEASTLabs' atleast='1.5.3'/>

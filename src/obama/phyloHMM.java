@@ -418,7 +418,7 @@ public class PhyloHMM extends Distribution {
 				double max = Double.NEGATIVE_INFINITY;
 				int iMax = -1;
 				for (int v = 0; v < HMMStateCount; v++) {
-					if (transitionRates[u * HMMStateCount + v] + p0[v]> max) {
+					if (transitionRates[u * HMMStateCount + v] + p0[v] > max) {
 						max = transitionRates[u * HMMStateCount + v] + p0[v];
 						iMax = v;
 					}

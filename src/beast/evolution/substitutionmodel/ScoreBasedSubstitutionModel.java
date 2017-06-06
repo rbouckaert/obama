@@ -64,6 +64,8 @@ abstract public class ScoreBasedSubstitutionModel extends GeneralSubstitutionMod
 			}			
 		}
 		
+		eigenDecomposition = eigenSystem.decomposeMatrix(PMatrix);
+		
 		// take the log of the matrix
         int i, j, k;
         double temp;
