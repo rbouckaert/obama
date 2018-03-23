@@ -1,12 +1,12 @@
-<addon name='OBAMA' version='0.0.2' description="OBAMA Bayesian Amino-acid Model Averaging">
-	<depends on='beast2' atleast='2.4.0'/>
-    <depends on='bModelTest' atleast='1.0.3'/>
-    <depends on='BEASTLabs' atleast='1.5.3'/>
+<package name='OBAMA' version='0.1.0' description="OBAMA Bayesian Amino-acid Model Averaging">
+	<depends on='beast2' atleast='2.5.0'/>
+    <depends on='bModelTest' atleast='1.1.0'/>
+    <depends on='BEASTLabs' atleast='1.6.0'/>
 
-    <addonapp description="OBAMAAnalyser"
+    <packageapp description="OBAMAAnalyser"
               class="obama.OBAMAAnalyser"
               icon="obama/obama256.png"
               args=""
             />
 
-</addon>
+</package>
