@@ -93,7 +93,7 @@ public class RatesForConservedRegions extends CalculationNode implements Functio
 	}
 
 	@Override
-	public void log(int sample, PrintStream out) {
+	public void log(long sample, PrintStream out) {
 		for (int i = 0; i < rates.length; i++) {
 			out.append(rates[i] + "\t");
 		}

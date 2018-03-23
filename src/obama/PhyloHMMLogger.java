@@ -30,7 +30,7 @@ public class PhyloHMMLogger extends BEASTObject implements Loggable {
 	}
 
 	@Override
-	public void log(int sample, PrintStream out) {
+	public void log(long sample, PrintStream out) {
 
 		_phyloHMM.calculateLogP();
 		switch (_phyloHMM.hmmAlgorithmInput.get()) {
