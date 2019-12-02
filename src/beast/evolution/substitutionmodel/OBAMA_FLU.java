@@ -141,7 +141,7 @@ public class OBAMA_FLU extends EmpiricalSubstitutionModel {
         return rate;
     }
     
-    double[] getEmpiricalFrequencies() {
+    public double[] getEmpiricalFrequencies() {
 
         double[] f = new double[20];
         f[0] = 0.0470718; // A

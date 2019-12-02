@@ -5,11 +5,9 @@ import java.util.Arrays;
 import org.apache.commons.math.distribution.GammaDistribution;
 import org.apache.commons.math.distribution.GammaDistributionImpl;
 
-import beast.core.Citation;
 import beast.core.Description;
 import beast.core.Input;
 import beast.core.Input.Validate;
-import beast.core.parameter.BooleanParameter;
 import beast.core.parameter.IntegerParameter;
 import beast.evolution.tree.Node;
 

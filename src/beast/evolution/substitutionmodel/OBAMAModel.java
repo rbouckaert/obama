@@ -20,7 +20,8 @@ import beast.evolution.tree.Node;
 		"as well as switch between the model's frequencies and external frequencies (as for example " +
 		"empirical frequencies informed by an alignment).")
 public class OBAMAModel extends GeneralSubstitutionModel {
-	final public Input<BooleanParameter> useExternalFreqsInput = new Input<>("useExternalFreqs", "if false, use", new BooleanParameter("false"));
+	final public Input<BooleanParameter> useExternalFreqsInput = new Input<>("useExternalFreqs", "if false, use substitution model frequencies, "
+			+ "otherwise use frequencies from frequencies input (e.g. empirical frequencies)", new BooleanParameter("false"));
 	final public Input<List<EmpiricalSubstitutionModel>> substModelInput = new Input<>("model", "empicial amino acid substitution model", new ArrayList<>(), Validate.REQUIRED);
 	final public Input<IntegerParameter> modelIndicatorInput = new Input<>("modelIndicator", "index of the model in list of models that is used for its rates and frequencies", Validate.REQUIRED);
 

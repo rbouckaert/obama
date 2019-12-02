@@ -87,7 +87,7 @@ public class OBAMAAnalyser extends Runnable {
 				Log.info("\ncount\tpercent\tmodel");
 				Log.info("=============================");
 				Log.info(modelCount[0] + "\t" + formatter.format(modelCount[0] * 100.0 / modelTrace.length) + "\tUse model frequencies");
-				Log.info(modelCount[1] + "\t" + formatter.format(modelCount[1] * 100.0 / modelTrace.length) + "\tUse empirical frequencies based on alignment");
+				Log.info(modelCount[1] + "\t" + formatter.format(modelCount[1] * 100.0 / modelTrace.length) + "\tUse external frequencies");
 
 			}
 		}
