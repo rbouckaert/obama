@@ -25,7 +25,8 @@ beast.math.distributions.NucleotideRevJumpSubstModelRatePrior.distr"
         <parameter id="OBAMA_gammaShape.s:$(n)" name="stateNode">1.0</parameter>
         <parameter id="OBAMA_ProportionInvariable.s:$(n)" lower="0.0" name="stateNode" upper="1.0">0.1</parameter>
         <stateNode id="OBAMA_hasInvariableSites.s:$(n)" spec="parameter.IntegerParameter">1</stateNode>        
-        <stateNode id="OBAMA_hasGammaRates.s:$(n)" spec="parameter.IntegerParameter">1</stateNode>        
+        <stateNode id="OBAMA_hasGammaRates.s:$(n)" spec="parameter.IntegerParameter">1</stateNode>  
+        <parameter id="OBAMA_frequencies.s:$(n)" name="stateNode" dimension="20">0.05</parameter>
 
         <!-- frequencies estimation -->
         <stateNode id="OBAMA_useExternalFreqs.s:$(n)" spec="parameter.BooleanParameter">false</stateNode>
@@ -44,29 +45,38 @@ beast.math.distributions.NucleotideRevJumpSubstModelRatePrior.distr"
 
     	<prior id='OBAMA_MutationRatePrior.s:$(n)' x='@OBAMA_mutationRate.s:$(n)'><distr spec="OneOnX"/></prior>
             
+        <prior id="OBAMA_freqsPrior.s:$(n)" name="distribution" x="@OBAMA_frequencies.s:$(n)">
+            <distr id="Dirichlet" spec="beast.math.distributions.Dirichlet">
+                <parameter id="RealParameter" spec="parameter.RealParameter" dimension="20" lower="0.0" name="alpha" upper="0.0">4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0</p
+arameter>
+            </distr>
+        </prior>
+
 	    <siteModel id="OBAMA.s:$(n)" spec="beast.evolution.sitemodel.OBAMAModelTestSiteModel" 
 		    gammaCategoryCount="4" proportionInvariant="@OBAMA_ProportionInvariable.s:$(n)" shape="@OBAMA_gammaShape.s:$(n)"
 		    hasGammaRates="@OBAMA_hasGammaRates.s:$(n)" hasInvariantSites="@OBAMA_hasInvariableSites.s:$(n)">
 	        <parameter id="OBAMA_mutationRate.s:$(n)" estimate="false" name="mutationRate">1.0</parameter>
                 <substModel id="OBAMA_substmodel.s:$(n)" spec="OBAMAModel">
-                    	<frequencies id="OBAMA_empiricalFreqs.s:$(n)" spec="Frequencies" data="@$(n)"/>
+                    	<frequencies id="OBAMA_empiricalFreqs.s:$(n)" spec="Frequencies" frequencies="@OBAMA_frequencies.s:$(n)"/>
                     	<useExternalFreqs idref="OBAMA_useExternalFreqs.s:$(n)"/>
                     	<modelIndicator idref="OBAMA_ModelIndicator.s:$(n)"/>
 <model spec="OBAMA_Blosum62" /><!--"Blosum62"/-->
 <model spec="OBAMA_CpREV"    /><!--"CpREV"/-->
 <model spec="OBAMA_DCMut"    /><!--"DCMut"/-->
 <model spec="OBAMA_Dayhoff"  /><!--"Dayhoff"/-->
+<model spec="OBAMA_FLU"      /><!--"FLU"/-->
+
 <model spec="OBAMA_HIVb"     /><!--"HIVb"/-->
 <model spec="OBAMA_HIVw"     /><!--"HIVw"/-->
 <model spec="OBAMA_JTT"      /><!--"JTT"/-->
 <model spec="OBAMA_LG"       /><!--"LG"/-->
 <model spec="OBAMA_MtArt"    /><!--"MtArt"/-->
+
 <model spec="OBAMA_MtREV"    /><!--"MtREV"/-->
 <model spec="OBAMA_MtMam"    /><!--"MtMam"/-->
 <model spec="OBAMA_RtREV"    /><!--"RtREV"/-->
 <model spec="OBAMA_VT"       /><!--"VT"/-->
 <model spec="OBAMA_WAG"      /><!--"WAG"/-->
-<model spec="OBAMA_FLU"      /><!--"FLU"/-->
                     </substModel>
 	    </siteModel>
 	
@@ -92,7 +102,12 @@ beast.math.distributions.NucleotideRevJumpSubstModelRatePrior.distr"
         </log>
 
 
-
+            
+        <operator id="OBAMA_FrequenciesAVMNOperator.s:$(n)" spec="starbeast3.operators.AdaptableVarianceMultivariateNormalOperator" beta="0.05" burnin="500" initial="1000" weight="1.0">
+        	<transformations id="Transform$LogConstrainedSumTransform" spec="starbeast3.util.Transform$LogConstrainedSumTransform">
+            	<f idref="OBAMA_frequencies.s:$(n)"/>
+	        </transformations>
+    	</operator>
             ]]>
 
             <connect method="beast.app.beauti.SiteModelInputEditor.customConnector"/>
@@ -110,6 +125,11 @@ beast.math.distributions.NucleotideRevJumpSubstModelRatePrior.distr"
             <connect srcID='OBAMA_mutationRate.s:$(n)'              targetID='state' inputName='stateNode' if='inlikelihood(OBAMA_mutationRate.s:$(n)) and OBAMA_mutationRate.s:$(n)/estimate=true'/>
             <connect srcID='OBAMA_mutationRateScaler.s:$(n)'        targetID='mcmc' inputName='operator' if='nooperator(FixMeanMutationRatesOperator) and inlikelihood(OBAMA_mutationRate.s:$(n)) and OBAMA_mutationRate.s:$(n)/estimate=true'>Scales mutation rate of partition s:$(n)</connect>
             <connect srcID='OBAMA_mutationRate.s:$(n)'              targetID='tracelog' inputName='log' if='inlikelihood(OBAMA_mutationRate.s:$(n)) and OBAMA_mutationRate.s:$(n)/estimate=true'/>
+
+            <connect srcID='OBAMA_freqsPrior.s:$(n)'                targetID='prior' inputName='distribution' if='inlikelihood(OBAMA_frequencies.s:$(n)) and OBAMA_frequencies.s:$(n)/estimate=true'/>
+            <connect srcID='OBAMA_frequencies.s:$(n)'               targetID='state' inputName='stateNode' if='inlikelihood(OBAMA_frequencies.s:$(n)) and OBAMA_frequencies.s:$(n)/estimate=true'/>
+            <connect srcID='OBAMA_FrequenciesAVMNOperator.s:$(n)'   targetID='mcmc' inputName='operator' if='inlikelihood(OBAMA_frequencies.s:$(n)) and OBAMA_frequencies.s:$(n)/estimate=true'>AVMN proposal for frequencies of partition s:$(n)</connect>
+            <connect srcID='OBAMA_frequencies.s:$(n)'               targetID='tracelog' inputName='log' if='inlikelihood(OBAMA_frequencies.s:$(n)) and OBAMA_frequencies.s:$(n)/estimate=true'/>
             
             <connect srcID='OBAMA_GammaShapePrior.s:$(n)'           targetID='prior' inputName='distribution' if='inlikelihood(OBAMA.s:$(n)) and OBAMA_gammaShape.s:$(n)/estimate=true'>Prior on gamma shape parameter for partition s:$(n)</connect>
             <connect srcID='OBAMA_PropInvariablePrior.s:$(n)'        targetID='prior' inputName='distribution' if='inlikelihood(OBAMA.s:$(n)) and OBAMA_ProportionInvariable.s:$(n)/estimate=true'>Prior on proportion invariant for partition s:$(n)</connect>
