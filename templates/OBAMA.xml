@@ -103,7 +103,7 @@ beast.math.distributions.NucleotideRevJumpSubstModelRatePrior.distr"
 
             
         <operator id="OBAMA_FrequenciesAVMNOperator.s:$(n)" spec="beast.evolution.operators.AdaptableVarianceMultivariateNormalOperator" beta="0.05" burnin="500" initial="1000" weight="1.0">
-        	<transformations id="LogConstrainedSumTransform" spec="beast.util.Transform$LogConstrainedSumTransform">
+        	<transformations id="LogConstrainedSumTransform.s:$(n)" spec="beast.util.Transform$LogConstrainedSumTransform">
             	<f idref="OBAMA_frequencies.s:$(n)"/>
 	        </transformations>
     	</operator>
