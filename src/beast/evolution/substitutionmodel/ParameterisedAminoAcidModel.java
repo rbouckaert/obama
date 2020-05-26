@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import beast.core.Description;
 import beast.core.Input;
 import beast.core.Input.Validate;
 import beast.core.parameter.RealParameter;
@@ -12,6 +13,7 @@ import beast.evolution.datatype.Aminoacid;
 import beast.evolution.datatype.DataType;
 import beast.evolution.substitutionmodel.GeneralSubstitutionModel;
 
+@Description("Substitution model for amino acid based on nucleotide models for individual codon positions")
 public class ParameterisedAminoAcidModel extends GeneralSubstitutionModel {
 	final public Input<GeneralSubstitutionModel> substModel1Input = new Input<>("model1", "nucleotide substitution model for "
 			+ "codon position 1", Validate.REQUIRED);

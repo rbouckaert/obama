@@ -1,9 +1,11 @@
 package beast.evolution.substitutionmodel;
 
+import beast.core.Description;
 import beast.evolution.datatype.Aminoacid;
 import beast.evolution.datatype.DataType;
 /** model data from codonPHYML, which is based on PHYML **/
 
+@Description("HIVw substitution model for amino acids")
 public class OBAMA_HIVw extends EmpiricalSubstitutionModel {
     @Override
     double[][] getEmpiricalRates() {
