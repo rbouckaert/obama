@@ -5,6 +5,7 @@ import java.util.Arrays;
 import org.apache.commons.math.distribution.GammaDistribution;
 import org.apache.commons.math.distribution.GammaDistributionImpl;
 
+import beast.core.Citation;
 import beast.core.Description;
 import beast.core.Input;
 import beast.core.Input.Validate;
@@ -12,6 +13,7 @@ import beast.core.parameter.IntegerParameter;
 import beast.evolution.tree.Node;
 
 @Description("Site model that jumps between with and without gamma sites, as well as with and without invariant sites")
+@Citation(value="Remco Bouckaert. OBAMA: OBAMA for Bayesian amino-acid model averaging. Peerj. 2020.", year=2020, DOI="https://doi.org/10.7717/peerj.44129")
 public class OBAMAModelTestSiteModel extends SiteModel {
 
 	public Input<IntegerParameter> hasGammaRatesInput = new Input<IntegerParameter>("hasGammaRates", "flag indicating whether gamma rate heterogeneity should be used (if 1) or not (if 0)", Validate.REQUIRED);
