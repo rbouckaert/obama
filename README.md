@@ -10,3 +10,6 @@ Data files for the experiments in the manuscripts can be found [here](https://gi
 
 [Trouble shooting](https://github.com/rbouckaert/obama/wiki/Trouble-shooting)
 
+### Reference
+
+Remco Bouckaert. OBAMA: OBAMA for Bayesian amino-acid model averaging. PeerJ 8, [e9460](https://peerj.com/articles/9460/)
