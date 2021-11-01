@@ -1,9 +1,11 @@
 package beast.evolution.substitutionmodel;
 
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
+import beast.core.Citation;
 import beast.core.Description;
 import beast.core.Input;
 import beast.core.Input.Validate;
@@ -12,13 +14,13 @@ import beast.core.parameter.IntegerParameter;
 import beast.core.util.Log;
 import beast.evolution.datatype.Aminoacid;
 import beast.evolution.datatype.DataType;
-import beast.evolution.substitutionmodel.EmpiricalSubstitutionModel;
-import beast.evolution.substitutionmodel.GeneralSubstitutionModel;
 import beast.evolution.tree.Node;
 
 @Description("Substitution model that can average over a number of amino acid substitution models " +
 		"as well as switch between the model's frequencies and external frequencies (as for example " +
 		"empirical frequencies informed by an alignment).")
+@Citation(value="Remco Bouckaert. OBAMA: OBAMA for Bayesian amino-acid model averaging. PeerJ 8, e9460",
+		year = 2020, firstAuthorSurname = "bouckaert", DOI="doi.org/10.7717/peerj.9460")
 public class OBAMAModel extends GeneralSubstitutionModel {
 	final public Input<BooleanParameter> useExternalFreqsInput = new Input<>("useExternalFreqs", "if false, use substitution model frequencies, "
 			+ "otherwise use frequencies from frequencies input (e.g. empirical frequencies)", new BooleanParameter("false"));
