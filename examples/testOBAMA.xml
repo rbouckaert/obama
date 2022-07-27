@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><beast beautitemplate='Standard' beautistatus='' namespace="beast.pkgmgmt:beast.base.core:beast.base.inference:beast.base.evolution.alignment:beast.base.evolution.tree.coalescent:beast.base.util:beast.base.math:beast.evolution.nuc:beast.base.evolution.operator:beast.base.inference.operator:beast.base.evolution.sitemodel:beast.base.evolution.substitutionmodel:beast.base.evolution.likelihood" required="" version="2.4">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><beast beautitemplate='Standard' beautistatus='' namespace=":beast.pkgmgmt:beast.base.core:beast.base.inference:beast.base.evolution.alignment:beast.base.evolution.tree.coalescent:beast.base.util:beast.base.math:beast.evolution.nuc:beast.base.evolution.operator:beast.base.inference.operator:beast.base.evolution.sitemodel:beast.base.evolution.substitutionmodel:beast.base.evolution.likelihood" required="" version="2.4">
 
 
     <data
@@ -29,7 +29,7 @@ name="alignment">
 <map name="Exponential" >beast.base.inference.distribution.Exponential</map>
 <map name="LogNormal" >beast.base.inference.distribution.LogNormalDistributionModel</map>
 <map name="Normal" >beast.base.inference.distribution.Normal</map>
-<map name="Beta" >beast.math.distributions.Beta</map>
+<map name="Beta" >beast.base.inference.distribution.Beta</map>
 <map name="Gamma" >beast.base.inference.distribution.Gamma</map>
 <map name="LaplaceDistribution" >beast.base.inference.distribution.LaplaceDistribution</map>
 <map name="prior" >beast.base.inference.distribution.Prior</map>
@@ -81,7 +81,7 @@ name="alignment">
             <distribution id="treeLikelihood.protein" spec="ThreadedTreeLikelihood" data="@protein" tree="@Tree.t:protein">
                 <siteModel id="OBAMA.s:protein" spec="obama.sitemodel.OBAMAModelTestSiteModel" gammaCategoryCount="4" hasGammaRates="@OBAMA_hasGammaRates.s:protein" hasInvariantSites="@OBAMA_hasInvariableSites.s:protein" proportionInvariant="@OBAMA_ProportionInvariable.s:protein" shape="@OBAMA_gammaShape.s:protein">
                     <parameter id="OBAMA_mutationRate.s:protein" estimate="false" name="mutationRate">1.0</parameter>
-                    <substModel id="OBAMA_substmodel.s:protein" spec="OBAMAModel" modelIndicator="@OBAMA_ModelIndicator.s:protein" useExternalFreqs="@OBAMA_useExternalFreqs.s:protein">
+                    <substModel id="OBAMA_substmodel.s:protein" spec="obama.substitutionmodel.OBAMAModel" modelIndicator="@OBAMA_ModelIndicator.s:protein" useExternalFreqs="@OBAMA_useExternalFreqs.s:protein">
                         <model id="OBAMA_Blosum62.0" spec="obama.substitutionmodel.OBAMA_Blosum62"/>
                         <model id="OBAMA_CpREV.0" spec="obama.substitutionmodel.OBAMA_CpREV"/>
                         <model id="OBAMA_DCMut.0" spec="obama.substitutionmodel.OBAMA_DCMut"/>
@@ -94,7 +94,7 @@ name="alignment">
                         <model id="OBAMA_MtArt.0" spec="obama.substitutionmodel.OBAMA_MtArt"/>
                         <model id="OBAMA_MtREV.0" spec="obama.substitutionmodel.OBAMA_MtREV"/>
                         <model id="OBAMA_MtMam.0" spec="obama.substitutionmodel.OBAMA_MtMam"/>
-                        <model id="OBAMA_RtREV.0" spec="Oobama.substitutionmodel.BAMA_RtREV"/>
+                        <model id="OBAMA_RtREV.0" spec="obama.substitutionmodel.OBAMA_RtREV"/>
                         <model id="OBAMA_VT.0" spec="obama.substitutionmodel.OBAMA_VT"/>
                         <model id="OBAMA_WAG.0" spec="obama.substitutionmodel.OBAMA_WAG"/>
                         <frequencies id="OBAMA_empiricalFreqs.s:protein" spec="Frequencies" data="@protein"/>
@@ -148,13 +148,13 @@ name="alignment">
         <log idref="OBAMA_ProportionInvariable.s:protein"/>
         <log idref="OBAMA_hasGammaRates.s:protein"/>
         <log idref="OBAMA_hasInvariableSites.s:protein"/>
-        <log id="OBAMA_ActivePropInvariable.s:protein" spec="beast.util.Script" argnames="OBAMA_ProportionInvariable OBAMA_hasInvariableSites" expression="OBAMA_ProportionInvariable * OBAMA_hasInvariableSites">
-            <x idref="OBAMA_ProportionInvariable.s:protein"/>
-            <x idref="OBAMA_hasInvariableSites.s:protein"/>
+        <log id="OBAMA_ActivePropInvariable.s:protein" spec='bmodeltest.evolution.substitutionmodel.ActiveLogger'>
+                <parameter idref="OBAMA_ProportionInvariable.s:protein"/>
+                <mask idref="OBAMA_hasInvariableSites.s:protein"/>
         </log>
-        <log id="OBAMA_ActiveGammaShape.s:protein" spec="beast.util.Script" argnames="OBAMA_gammaShape OBAMA_hasGammaRates" expression="OBAMA_gammaShape * OBAMA_hasGammaRates">
-            <x idref="OBAMA_gammaShape.s:protein"/>
-            <x idref="OBAMA_hasGammaRates.s:protein"/>
+        <log id="OBAMA_ActiveGammaShape.s:protein" spec='bmodeltest.evolution.substitutionmodel.ActiveLogger'>
+                <parameter idref="OBAMA_gammaShape.s:protein"/>
+                <mask idref="OBAMA_hasGammaRates.s:protein"/>
         </log>
         <log idref="OBAMA_useExternalFreqs.s:protein"/>
     </logger>
@@ -167,7 +167,7 @@ name="alignment">
     </logger>
 
     <logger id="treelog.t:protein" fileName="$(tree).trees" logEvery="1000" mode="tree">
-        <log id="TreeWithMetaDataLogger.t:protein" spec="beast.base.evolution.tree.TreeWithMetaDataLogger" tree="@Tree.t:protein"/>
+        <log id="TreeWithMetaDataLogger.t:protein" spec="beast.base.evolution.TreeWithMetaDataLogger" tree="@Tree.t:protein"/>
     </logger>
 
 </run>

@@ -164,7 +164,7 @@ id="primate-mtDNA">
     </logger>
 
     <logger id="treelog.t:tree" fileName="primate-mtDNA.trees" logEvery="10000" mode="tree">
-        <log id="TreeWithMetaDataLogger.t:tree" spec="beast.base.evolution.tree.TreeWithMetaDataLogger" tree="@Tree.t:tree"/>
+        <log id="TreeWithMetaDataLogger.t:tree" spec="beast.base.evolution.TreeWithMetaDataLogger" tree="@Tree.t:tree"/>
     </logger>
 
     <logger id="tracelog2" fileName="primate-mtDNA-phyloHMM.log" logEvery="10000">

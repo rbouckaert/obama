@@ -55,7 +55,7 @@ bmodeltest.math.distributions.NucleotideRevJumpSubstModelRatePrior.distr"
 		    gammaCategoryCount="4" proportionInvariant="@OBAMA_ProportionInvariable.s:$(n)" shape="@OBAMA_gammaShape.s:$(n)"
 		    hasGammaRates="@OBAMA_hasGammaRates.s:$(n)" hasInvariantSites="@OBAMA_hasInvariableSites.s:$(n)">
 	        <parameter id="OBAMA_mutationRate.s:$(n)" estimate="false" name="mutationRate">1.0</parameter>
-                <substModel id="OBAMA_substmodel.s:$(n)" spec="OBAMAModel">
+                <substModel id="OBAMA_substmodel.s:$(n)" spec="obama.substitutionmodel.OBAMAModel">
                     	<frequencies id="OBAMA_freqs.s:$(n)" spec="Frequencies" frequencies="@OBAMA_frequencies.s:$(n)"/>
                     	<useExternalFreqs idref="OBAMA_useExternalFreqs.s:$(n)"/>
                     	<modelIndicator idref="OBAMA_ModelIndicator.s:$(n)"/>
@@ -71,7 +71,7 @@ bmodeltest.math.distributions.NucleotideRevJumpSubstModelRatePrior.distr"
                         <model id="OBAMA_MtArt.0" spec="obama.substitutionmodel.OBAMA_MtArt"/>
                         <model id="OBAMA_MtREV.0" spec="obama.substitutionmodel.OBAMA_MtREV"/>
                         <model id="OBAMA_MtMam.0" spec="obama.substitutionmodel.OBAMA_MtMam"/>
-                        <model id="OBAMA_RtREV.0" spec="Oobama.substitutionmodel.BAMA_RtREV"/>
+                        <model id="OBAMA_RtREV.0" spec="obama.substitutionmodel.OBAMA_RtREV"/>
                         <model id="OBAMA_VT.0" spec="obama.substitutionmodel.OBAMA_VT"/>
                         <model id="OBAMA_WAG.0" spec="obama.substitutionmodel.OBAMA_WAG"/>
                     </substModel>
