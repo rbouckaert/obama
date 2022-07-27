@@ -1,4 +1,4 @@
-package beast.app.beauti;
+package obama.app.beauti;
 
 
 import java.util.ArrayList;
@@ -8,12 +8,27 @@ import java.util.List;
 import beastfx.app.inputeditor.BeautiDoc;
 import beastfx.app.inputeditor.SiteModelInputEditor;
 import javafx.scene.control.CheckBox;
+import obama.sitemodel.OBAMAModelTestSiteModel;
+import obama.substitutionmodel.OBAMAModel;
+import obama.substitutionmodel.OBAMA_Blosum62;
+import obama.substitutionmodel.OBAMA_CpREV;
+import obama.substitutionmodel.OBAMA_DCMut;
+import obama.substitutionmodel.OBAMA_Dayhoff;
+import obama.substitutionmodel.OBAMA_FLU;
+import obama.substitutionmodel.OBAMA_HIVb;
+import obama.substitutionmodel.OBAMA_HIVw;
+import obama.substitutionmodel.OBAMA_JTT;
+import obama.substitutionmodel.OBAMA_LG;
+import obama.substitutionmodel.OBAMA_MtArt;
+import obama.substitutionmodel.OBAMA_MtMam;
+import obama.substitutionmodel.OBAMA_MtREV;
+import obama.substitutionmodel.OBAMA_RtREV;
+import obama.substitutionmodel.OBAMA_VT;
+import obama.substitutionmodel.OBAMA_WAG;
 import beast.base.core.BEASTInterface;
 import beast.base.core.Input;
 import beast.base.evolution.substitutionmodel.EmpiricalSubstitutionModel;
 import beast.base.evolution.substitutionmodel.SubstitutionModel;
-import beast.evolution.sitemodel.OBAMAModelTestSiteModel;
-import beast.evolution.substitutionmodel.*;
 
 public class OBAMAModelTestInputEditor extends SiteModelInputEditor {
 	static List<EmpiricalSubstitutionModel> availableModels;

@@ -1,7 +1,42 @@
-<package name='OBAMA' version='1.0.0' description="OBAMA for Bayesian Amino-acid Model Averaging">
+<package name='OBAMA' version='1.1.0' description="OBAMA for Bayesian Amino-acid Model Averaging">
 	<depends on='beast2' atleast='2.7.0'/>
     <depends on='bModelTest' atleast='1.3.0'/>
     <depends on='BEASTLabs' atleast='2.0.0'/>
+
+    <service type="beast.base.core.BEASTInterface">
+        <provider classname="obama.OBAMAAnalyser"/>
+        <provider classname="obama.PhyloHMM"/>
+        <provider classname="obama.PhyloHMMAnalyser"/>
+        <provider classname="obama.PhyloHMMLogger"/>
+        <provider classname="obama.PhyloHMMSparse"/>
+        <provider classname="obama.PhyloHMMVar"/>
+        <provider classname="obama.RatesForConservedRegions"/>
+        <provider classname="obama.sitemodel.OBAMAModelTestSiteModel"/>
+        <provider classname="obama.substitutionmodel.OBAMA_Blosum62"/>
+        <provider classname="obama.substitutionmodel.OBAMA_CpREV"/>
+        <provider classname="obama.substitutionmodel.OBAMA_Dayhoff"/>
+        <provider classname="obama.substitutionmodel.OBAMA_DCMut"/>
+        <provider classname="obama.substitutionmodel.OBAMA_FLU"/>
+        <provider classname="obama.substitutionmodel.OBAMA_HIVb"/>
+        <provider classname="obama.substitutionmodel.OBAMA_HIVw"/>
+        <provider classname="obama.substitutionmodel.OBAMA_JTT"/>
+        <provider classname="obama.substitutionmodel.OBAMA_LG"/>
+        <provider classname="obama.substitutionmodel.OBAMA_MtArt"/>
+        <provider classname="obama.substitutionmodel.OBAMA_MtMam"/>
+        <provider classname="obama.substitutionmodel.OBAMA_MtREV"/>
+        <provider classname="obama.substitutionmodel.OBAMA_RtREV"/>
+        <provider classname="obama.substitutionmodel.OBAMA_VT"/>
+        <provider classname="obama.substitutionmodel.OBAMA_WAG"/>
+        <provider classname="obama.substitutionmodel.OBAMAModel"/>
+        <provider classname="obama.substitutionmodel.ParameterisedAminoAcidModel"/>
+        <provider classname="obama.substitutionmodel.PHAT"/>
+        <provider classname="obama.Transition"/>
+    </service>
+
+    <service type="beastfx.app.inputeditor.InputEditor">
+        <provider classname="obama.app.beauti.OBAMAModelTestInputEditor"/>
+    </service>
+
 
     <packageapp description="OBAMAAnalyser"
               class="obama.OBAMAAnalyser"

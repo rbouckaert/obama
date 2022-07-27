@@ -1,4 +1,4 @@
-package beast.evolution.sitemodel;
+package obama.sitemodel;
 
 import java.util.Arrays;
 

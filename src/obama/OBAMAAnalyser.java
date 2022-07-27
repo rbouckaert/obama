@@ -10,13 +10,13 @@ import beastfx.app.tools.Application;
 import beastfx.app.tools.LogAnalyser;
 import beastfx.app.util.LogFile;
 import beastfx.app.util.XMLFile;
+import obama.substitutionmodel.OBAMAModel;
 import beast.base.core.BEASTInterface;
 import beast.base.core.Input;
 import beast.base.inference.Runnable;
 import beast.base.core.Log;
 import beast.base.core.Input.Validate;
 import beast.base.inference.MCMC;
-import beast.evolution.substitutionmodel.OBAMAModel;
 import beast.base.evolution.substitutionmodel.EmpiricalSubstitutionModel;
 import beast.base.parser.XMLParser;
 

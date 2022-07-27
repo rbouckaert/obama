@@ -1,4 +1,4 @@
-package beast.evolution.substitutionmodel;
+package obama.substitutionmodel;
 
 import beast.base.core.Citation;
 import beast.base.core.Description;

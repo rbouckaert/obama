@@ -1,4 +1,4 @@
-package beast.evolution.substitutionmodel;
+package obama.substitutionmodel;
 
 
 import java.lang.reflect.InvocationTargetException;
