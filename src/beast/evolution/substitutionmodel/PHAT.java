@@ -1,7 +1,7 @@
 package beast.evolution.substitutionmodel;
 
-import beast.core.Citation;
-import beast.core.Description;
+import beast.base.core.Citation;
+import beast.base.core.Description;
 
 //from http://www.genome.jp/aaindex/
 //	H NGPC000101

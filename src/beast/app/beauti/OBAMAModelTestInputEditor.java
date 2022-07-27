@@ -4,20 +4,18 @@ package beast.app.beauti;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 
-import beast.app.draw.EnumInputEditor;
-import beast.core.BEASTInterface;
-import beast.core.Input;
+import beastfx.app.inputeditor.BeautiDoc;
+import beastfx.app.inputeditor.SiteModelInputEditor;
+import javafx.scene.control.CheckBox;
+import beast.base.core.BEASTInterface;
+import beast.base.core.Input;
+import beast.base.evolution.substitutionmodel.EmpiricalSubstitutionModel;
+import beast.base.evolution.substitutionmodel.SubstitutionModel;
 import beast.evolution.sitemodel.OBAMAModelTestSiteModel;
 import beast.evolution.substitutionmodel.*;
 
 public class OBAMAModelTestInputEditor extends SiteModelInputEditor {
-	private static final long serialVersionUID = 1L;
 	static List<EmpiricalSubstitutionModel> availableModels;
 	
 	@Override
@@ -51,17 +49,8 @@ public class OBAMAModelTestInputEditor extends SiteModelInputEditor {
 	public void init(Input<?> input, BEASTInterface plugin, int itemNr, ExpandOption bExpandOption, boolean bAddButtons) {
 		super.init(input, plugin, itemNr, bExpandOption, bAddButtons);
 		
-		Box o = (Box) getComponent(0);
-		JPanel p = (JPanel) o.getComponent(1);
-		JLabel l = (JLabel) p.getComponent(0);
-		l.setText("Subsitution rate:");
-		
-		
 		OBAMAModelTestSiteModel siteModel = (OBAMAModelTestSiteModel)input.get();
 		SubstitutionModel sm = siteModel.substModelInput.get();
-		EnumInputEditor typeEditor = new EnumInputEditor(doc);
-		((Box) getComponent(0)).add(typeEditor, 2);
-
 		OBAMAModel substModel = (OBAMAModel) sm;
 		List<EmpiricalSubstitutionModel> models = substModel.substModelInput.get();
 
@@ -69,7 +58,7 @@ public class OBAMAModelTestInputEditor extends SiteModelInputEditor {
 		for (EmpiricalSubstitutionModel m : availableModels) {
 			addCheckBox(m, models, k++);
 		}
-		validate();
+		//validate();
 	}
 
 	private void addCheckBox(EmpiricalSubstitutionModel m, List<EmpiricalSubstitutionModel> models, int offset) {
@@ -78,8 +67,8 @@ public class OBAMAModelTestInputEditor extends SiteModelInputEditor {
 		if (modelLabel.startsWith("OBAMA_")) {
 			modelLabel = modelLabel.substring(6);
 		}
-		JCheckBox checkBox = new JCheckBox(modelLabel);
-		checkBox.setName(modelName);
+		CheckBox checkBox = new CheckBox(modelLabel);
+		checkBox.setId(modelName);
 		
 		boolean selected = false;
 		for (EmpiricalSubstitutionModel m0 : models) {
@@ -89,17 +78,12 @@ public class OBAMAModelTestInputEditor extends SiteModelInputEditor {
 			}
 		}
 		checkBox.setSelected(selected);
-		checkBox.addActionListener(e -> {
-			JCheckBox b = (JCheckBox) e.getSource();
-			String label = b.getName();
+		checkBox.setOnAction(e -> {
+			CheckBox b = (CheckBox) e.getSource();
+			String label = b.getId();
 			setModel(label, b.isSelected());
 		});
-		JPanel panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panel.add(checkBox);
-		panel.add(Box.createHorizontalGlue());
-		
-		((Box) getComponent(0)).add(panel, offset);
+		pane.getChildren().add(offset, checkBox);
 	}
 
 	private void setModel(String label, boolean selected) {

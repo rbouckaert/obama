@@ -6,19 +6,19 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import beast.app.util.Application;
-import beast.app.util.LogFile;
-import beast.app.util.XMLFile;
-import beast.core.BEASTInterface;
-import beast.core.Input;
-import beast.core.Runnable;
-import beast.core.util.Log;
-import beast.core.Input.Validate;
-import beast.core.MCMC;
+import beastfx.app.tools.Application;
+import beastfx.app.tools.LogAnalyser;
+import beastfx.app.util.LogFile;
+import beastfx.app.util.XMLFile;
+import beast.base.core.BEASTInterface;
+import beast.base.core.Input;
+import beast.base.inference.Runnable;
+import beast.base.core.Log;
+import beast.base.core.Input.Validate;
+import beast.base.inference.MCMC;
 import beast.evolution.substitutionmodel.OBAMAModel;
-import beast.evolution.substitutionmodel.EmpiricalSubstitutionModel;
-import beast.util.LogAnalyser;
-import beast.util.XMLParser;
+import beast.base.evolution.substitutionmodel.EmpiricalSubstitutionModel;
+import beast.base.parser.XMLParser;
 
 public class OBAMAAnalyser extends Runnable {
 	public Input<XMLFile> xmlFileInput = new Input<>("xml", "XML file specifying the set of models", Validate.REQUIRED);

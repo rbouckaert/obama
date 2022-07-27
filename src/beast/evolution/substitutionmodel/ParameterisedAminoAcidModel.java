@@ -5,13 +5,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import beast.core.Description;
-import beast.core.Input;
-import beast.core.Input.Validate;
-import beast.core.parameter.RealParameter;
-import beast.evolution.datatype.Aminoacid;
-import beast.evolution.datatype.DataType;
-import beast.evolution.substitutionmodel.GeneralSubstitutionModel;
+import beast.base.core.Description;
+import beast.base.core.Input;
+import beast.base.core.Input.Validate;
+import beast.base.inference.parameter.RealParameter;
+import beast.base.evolution.datatype.Aminoacid;
+import beast.base.evolution.datatype.DataType;
+import beast.base.evolution.substitutionmodel.Frequencies;
+import beast.base.evolution.substitutionmodel.GeneralSubstitutionModel;
 
 @Description("Substitution model for amino acid based on nucleotide models for individual codon positions")
 public class ParameterisedAminoAcidModel extends GeneralSubstitutionModel {
@@ -167,7 +168,7 @@ public class ParameterisedAminoAcidModel extends GeneralSubstitutionModel {
 	}
         
     @Override
-    protected void setupRelativeRates() {
+    public void setupRelativeRates() {
     	Arrays.fill(relativeRates, 0);
 
     	model1.setupRelativeRates();
@@ -237,7 +238,7 @@ public class ParameterisedAminoAcidModel extends GeneralSubstitutionModel {
     	//	model1.updateMatrix = false;
     	//}
     	double [][] rates1 = model1.getRateMatrix();
-    	double [] relrates1 = model1.relativeRates;
+    	double [] relrates1 = model1.getRelativeRates();
     	double substRate = substRate1.getValue();
         for (int [] i : ratemap1) {
         	int i1 = i[1];

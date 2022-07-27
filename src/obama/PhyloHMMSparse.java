@@ -6,8 +6,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import beast.core.Description;
-import beast.core.Input;
+import beast.base.core.Description;
+import beast.base.core.Input;
 
 @Description("Like PhyloHMM, but using sparse transition rate matrix for HMM part")
 public class PhyloHMMSparse extends PhyloHMM {

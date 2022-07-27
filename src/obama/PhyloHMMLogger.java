@@ -2,12 +2,12 @@ package obama;
 
 import java.io.PrintStream;
 
-import beast.core.BEASTObject;
-import beast.core.Description;
-import beast.core.Input;
-import beast.core.Loggable;
-import beast.core.Input.Validate;
-import beast.util.Randomizer;
+import beast.base.core.BEASTObject;
+import beast.base.core.Description;
+import beast.base.core.Input;
+import beast.base.core.Loggable;
+import beast.base.core.Input.Validate;
+import beast.base.util.Randomizer;
 
 @Description("Logs sample of HMM states of a Phylo-HMM")
 public class PhyloHMMLogger extends BEASTObject implements Loggable {

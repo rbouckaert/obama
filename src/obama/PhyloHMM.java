@@ -12,19 +12,19 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 
-import beast.app.BeastMCMC;
-import beast.core.Description;
-import beast.core.Distribution;
-import beast.core.Function;
-import beast.core.Input;
-import beast.core.Input.Validate;
-import beast.core.State;
-import beast.core.parameter.IntegerParameter;
-import beast.core.parameter.RealParameter;
-import beast.core.util.Log;
-import beast.evolution.alignment.Alignment;
-import beast.evolution.likelihood.TreeLikelihood;
-import beast.evolution.substitutionmodel.Frequencies;
+import beast.base.core.Description;
+import beast.base.inference.Distribution;
+import beast.base.core.Function;
+import beast.base.core.Input;
+import beast.base.core.Input.Validate;
+import beast.base.inference.State;
+import beast.base.inference.parameter.IntegerParameter;
+import beast.base.inference.parameter.RealParameter;
+import beast.base.core.Log;
+import beast.base.core.ProgramStatus;
+import beast.base.evolution.alignment.Alignment;
+import beast.base.evolution.likelihood.TreeLikelihood;
+import beast.base.evolution.substitutionmodel.Frequencies;
 
 @Description("PhyloHMM combines hidden markov model (HMM) with tree likelihoods per site")
 public class PhyloHMM extends Distribution {
@@ -172,10 +172,10 @@ public class PhyloHMM extends Distribution {
 		patternCount = data.getPatternCount();
 		storedPatternLogP = new double[HMMOutputCount][patternCount];
 
-        useThreads = useThreadsInput.get() && (BeastMCMC.m_nThreads > 1);
-		nrOfThreads = useThreads ? BeastMCMC.m_nThreads : 1;
+        useThreads = useThreadsInput.get() && (ProgramStatus.m_nThreads > 1);
+		nrOfThreads = useThreads ? ProgramStatus.m_nThreads : 1;
 		if (useThreads && maxNrOfThreadsInput.get() > 0) {
-			nrOfThreads = Math.min(maxNrOfThreadsInput.get(), BeastMCMC.m_nThreads);
+			nrOfThreads = Math.min(maxNrOfThreadsInput.get(), ProgramStatus.m_nThreads);
 		}
 		if (useThreads) {
 		     exec = Executors.newFixedThreadPool(nrOfThreads);

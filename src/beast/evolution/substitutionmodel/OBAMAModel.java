@@ -5,16 +5,18 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-import beast.core.Citation;
-import beast.core.Description;
-import beast.core.Input;
-import beast.core.Input.Validate;
-import beast.core.parameter.BooleanParameter;
-import beast.core.parameter.IntegerParameter;
-import beast.core.util.Log;
-import beast.evolution.datatype.Aminoacid;
-import beast.evolution.datatype.DataType;
-import beast.evolution.tree.Node;
+import beast.base.core.Citation;
+import beast.base.core.Description;
+import beast.base.core.Input;
+import beast.base.core.Input.Validate;
+import beast.base.inference.parameter.BooleanParameter;
+import beast.base.inference.parameter.IntegerParameter;
+import beast.base.core.Log;
+import beast.base.evolution.datatype.Aminoacid;
+import beast.base.evolution.datatype.DataType;
+import beast.base.evolution.tree.Node;
+import beast.base.evolution.substitutionmodel.EmpiricalSubstitutionModel;
+import beast.base.evolution.substitutionmodel.GeneralSubstitutionModel;
 
 @Description("Substitution model that can average over a number of amino acid substitution models " +
 		"as well as switch between the model's frequencies and external frequencies (as for example " +
@@ -71,9 +73,10 @@ public class OBAMAModel extends GeneralSubstitutionModel {
 	
 	
 	@Override
-    protected void setupRelativeRates() {
+	public void setupRelativeRates() {
     	EmpiricalSubstitutionModel model = models.get(modelIndicator.getValue());
-        System.arraycopy(model.m_empiricalRates, 0, relativeRates, 0, model.m_empiricalRates.length);
+    	double [] empiricalRates = model.getEmpericalRateValues();
+        System.arraycopy(empiricalRates, 0, relativeRates, 0, empiricalRates.length);
     }
 
 	@Override

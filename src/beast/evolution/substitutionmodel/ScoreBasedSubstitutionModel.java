@@ -3,10 +3,11 @@ package beast.evolution.substitutionmodel;
 
 import java.lang.reflect.InvocationTargetException;
 
-import beast.core.Description;
-import beast.core.Input.Validate;
-import beast.evolution.datatype.Aminoacid;
-import beast.evolution.datatype.DataType;
+import beast.base.core.Description;
+import beast.base.core.Input.Validate;
+import beast.base.evolution.datatype.Aminoacid;
+import beast.base.evolution.datatype.DataType;
+import beast.base.evolution.substitutionmodel.GeneralSubstitutionModel;
 
 @Description("Amino acid substituion model based on scores.")
 abstract public class ScoreBasedSubstitutionModel extends GeneralSubstitutionModel {
@@ -100,7 +101,7 @@ abstract public class ScoreBasedSubstitutionModel extends GeneralSubstitutionMod
 	}
 
 	@Override
-    protected void setupRelativeRates() {
+	public void setupRelativeRates() {
     	setUpQMatrix();
     	System.arraycopy(Q, 0, relativeRates, 0, Q.length);
     }

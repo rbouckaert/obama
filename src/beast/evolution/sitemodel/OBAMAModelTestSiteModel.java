@@ -5,12 +5,13 @@ import java.util.Arrays;
 import org.apache.commons.math.distribution.GammaDistribution;
 import org.apache.commons.math.distribution.GammaDistributionImpl;
 
-import beast.core.Citation;
-import beast.core.Description;
-import beast.core.Input;
-import beast.core.Input.Validate;
-import beast.core.parameter.IntegerParameter;
-import beast.evolution.tree.Node;
+import beast.base.core.Citation;
+import beast.base.core.Description;
+import beast.base.core.Input;
+import beast.base.core.Input.Validate;
+import beast.base.inference.parameter.IntegerParameter;
+import beast.base.evolution.sitemodel.SiteModel;
+import beast.base.evolution.tree.Node;
 
 @Description("Site model that jumps between with and without gamma sites, as well as with and without invariant sites")
 @Citation(value="Remco Bouckaert. OBAMA: OBAMA for Bayesian amino-acid model averaging. Peerj. 2020.", year=2020, DOI="https://doi.org/10.7717/peerj.44129")

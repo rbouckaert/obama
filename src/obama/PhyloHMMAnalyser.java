@@ -17,22 +17,23 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
-import beast.app.BEASTVersion2;
-import beast.app.util.Application;
-import beast.app.util.LogFile;
-import beast.app.util.Utils;
-import beast.app.util.XMLFile;
-import beast.core.BEASTInterface;
-import beast.core.BEASTObject;
-import beast.core.Description;
-import beast.core.Function;
-import beast.core.Input;
-import beast.core.Runnable;
-import beast.core.Input.Validate;
-import beast.core.util.Log;
-import beast.util.LogAnalyser;
-import beast.util.XMLParser;
-import beast.util.XMLParserException;
+import beast.base.core.BEASTVersion2;
+import beastfx.app.tools.Application;
+import beastfx.app.util.LogFile;
+import beastfx.app.util.Utils;
+import beastfx.app.util.XMLFile;
+import bmodeltest.app.tools.WebViewer;
+import beast.base.core.BEASTInterface;
+import beast.base.core.BEASTObject;
+import beast.base.core.Description;
+import beast.base.core.Function;
+import beast.base.core.Input;
+import beast.base.inference.Runnable;
+import beast.base.core.Input.Validate;
+import beast.base.core.Log;
+import beastfx.app.tools.LogAnalyser;
+import beast.base.parser.XMLParser;
+import beast.base.parser.XMLParserException;
 
 @Description("Visualises PhyloHMM log created by PhyloHMMLogger")
 public class PhyloHMMAnalyser extends Runnable {
@@ -255,7 +256,7 @@ public class PhyloHMMAnalyser extends Runnable {
 				e.printStackTrace();
 			}
 		} else {
-			new beast.app.tools.WebViewer("PhyloHMMAnalyser", "file://" + jsPath + "/PhyloHMM" + instance + ".html");
+			new WebViewer("PhyloHMMAnalyser", "file://" + jsPath + "/PhyloHMM" + instance + ".html");
 		}
 	}
 

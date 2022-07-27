@@ -1,14 +1,15 @@
 package beast.evolution.substitutionmodel;
 
-import beast.core.Description;
-import beast.evolution.datatype.Aminoacid;
-import beast.evolution.datatype.DataType;
+import beast.base.core.Description;
+import beast.base.evolution.datatype.Aminoacid;
+import beast.base.evolution.datatype.DataType;
+import beast.base.evolution.substitutionmodel.EmpiricalSubstitutionModel;
 /** model data from codonPHYML, which is based on PHYML **/
 
 @Description("LG substitution model for amino acids")
 public class OBAMA_LG extends EmpiricalSubstitutionModel {
     @Override
-    double[][] getEmpiricalRates() {
+    public double[][] getEmpiricalRates() {
         double[][] rate = new double[20][20];
 
     

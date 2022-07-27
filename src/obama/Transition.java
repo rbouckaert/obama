@@ -1,8 +1,8 @@
 package obama;
 
-import beast.core.BEASTObject;
-import beast.core.Description;
-import beast.core.Param;
+import beast.base.core.BEASTObject;
+import beast.base.core.Description;
+import beast.base.core.Param;
 
 @Description("Specifies origin and target state for a rate in PhyloHMM")
 public class Transition extends BEASTObject {
