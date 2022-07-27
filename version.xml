@@ -44,4 +44,26 @@
               args=""
             />
 
+			<map from="beast.app.beauti.OBAMAModelTestInputEditor" to="obama.app.beauti.OBAMAModelTestInputEditor"/>
+			<map from="beast.evolution.sitemodel.OBAMAModelTestSiteModel" to="obama.sitemodel.OBAMAModelTestSiteModel"/>
+			<map from="beast.evolution.substitutionmodel.OBAMA_Blosum62" to="obama.substitutionmodel.OBAMA_Blosum62"/>
+			<map from="beast.evolution.substitutionmodel.OBAMA_CpREV" to="obama.substitutionmodel.OBAMA_CpREV"/>
+			<map from="beast.evolution.substitutionmodel.OBAMA_Dayhoff" to="obama.substitutionmodel.OBAMA_Dayhoff"/>
+			<map from="beast.evolution.substitutionmodel.OBAMA_DCMut" to="obama.substitutionmodel.OBAMA_DCMut"/>
+			<map from="beast.evolution.substitutionmodel.OBAMA_FLU" to="obama.substitutionmodel.OBAMA_FLU"/>
+			<map from="beast.evolution.substitutionmodel.OBAMA_HIVb" to="obama.substitutionmodel.OBAMA_HIVb"/>
+			<map from="beast.evolution.substitutionmodel.OBAMA_HIVw" to="obama.substitutionmodel.OBAMA_HIVw"/>
+			<map from="beast.evolution.substitutionmodel.OBAMA_JTT" to="obama.substitutionmodel.OBAMA_JTT"/>
+			<map from="beast.evolution.substitutionmodel.OBAMA_LG" to="obama.substitutionmodel.OBAMA_LG"/>
+			<map from="beast.evolution.substitutionmodel.OBAMAModel" to="obama.substitutionmodel.OBAMAModel"/>
+			<map from="beast.evolution.substitutionmodel.OBAMA_MtArt" to="obama.substitutionmodel.OBAMA_MtArt"/>
+			<map from="beast.evolution.substitutionmodel.OBAMA_MtMam" to="obama.substitutionmodel.OBAMA_MtMam"/>
+			<map from="beast.evolution.substitutionmodel.OBAMA_MtREV" to="obama.substitutionmodel.OBAMA_MtREV"/>
+			<map from="beast.evolution.substitutionmodel.OBAMA_RtREV" to="obama.substitutionmodel.OBAMA_RtREV"/>
+			<map from="beast.evolution.substitutionmodel.OBAMA_VT" to="obama.substitutionmodel.OBAMA_VT"/>
+			<map from="beast.evolution.substitutionmodel.OBAMA_WAG" to="obama.substitutionmodel.OBAMA_WAG"/>
+			<map from="beast.evolution.substitutionmodel.ParameterisedAminoAcidModel" to="obama.substitutionmodel.ParameterisedAminoAcidModel"/>
+			<map from="beast.evolution.substitutionmodel.PHAT" to="obama.substitutionmodel.PHAT"/>
+			<map from="beast.evolution.substitutionmodel.ScoreBasedSubstitutionModel" to="obama.substitutionmodel.ScoreBasedSubstitutionModel"/>
+
 </package>

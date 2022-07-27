@@ -45,7 +45,7 @@ bmodeltest.math.distributions.NucleotideRevJumpSubstModelRatePrior.distr"
     	<prior id='OBAMA_MutationRatePrior.s:$(n)' x='@OBAMA_mutationRate.s:$(n)'><distr spec="OneOnX"/></prior>
             
         <prior id="OBAMA_freqsPrior.s:$(n)" name="distribution" x="@OBAMA_frequencies.s:$(n)">
-            <distr id="Dirichlet" spec="beast.base.inference.distribution.Dirichlet">
+            <distr id="OBMAMA_Dirichlet" spec="beast.base.inference.distribution.Dirichlet">
                 <parameter id="RealParameter" spec="parameter.RealParameter" dimension="20" lower="0.0" name="alpha" upper="0.0">4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0
                 </parameter>
             </distr>
@@ -84,7 +84,7 @@ bmodeltest.math.distributions.NucleotideRevJumpSubstModelRatePrior.distr"
 		<operator id="OBAMA_hasInvariableSitesFlipper.s:$(n)" spec="bmodeltest.evolution.operators.BMTBirthDeathOperator" count="@OBAMA_hasInvariableSites.s:$(n)" rates="@OBAMA_ProportionInvariable.s:$(n)" weight="0.1"/>
 	    <operator id="OBAMA_ProportionInvariableScaler.s:$(n)" spec="bmodeltest.evolution.operators.BMTScaleOperator" count="@OBAMA_hasInvariableSites.s:$(n)" parameter="@OBAMA_ProportionInvariable.s:$(n)" scaleFactor="0.5" weight="0.5"/>
 
-        <operator id='OBAMA_mutationRateScaler.s:$(n)' spec='BactrianScaleOperator' scaleFactor="0.1" weight="0.1" parameter="@OBAMA_mutationRate.s:$(n)"/>
+        <operator id='OBAMA_mutationRateScaler.s:$(n)' spec='kernel.BactrianScaleOperator' scaleFactor="0.1" weight="0.1" parameter="@OBAMA_mutationRate.s:$(n)"/>
             
 	    <operator id="OBAMA_ModelIndicatorUniformOperator.s:$(n)" spec="UniformOperator" parameter="@OBAMA_ModelIndicator.s:$(n)" weight="3.0"/>
     	<operator id="OBAMA_FreqsFlipOperator.s:$(n)" spec="BitFlipOperator" parameter="@OBAMA_useExternalFreqs.s:$(n)" weight="0.1"/>
@@ -106,7 +106,7 @@ bmodeltest.math.distributions.NucleotideRevJumpSubstModelRatePrior.distr"
     	</operator>
             ]]>
 
-            <connect method="beast.app.inputeditor.SiteModelInputEditor.customConnector"/>
+            <connect method="beastfx.app.inputeditor.SiteModelInputEditor.customConnector"/>
 
             <connect srcID='OBAMA_ModelIndicator.s:$(n)'       targetID='state' inputName='stateNode' if='inlikelihood(OBAMA.s:$(n))'/>
             <connect srcID='OBAMA_gammaShape.s:$(n)'           targetID='state' inputName='stateNode' if='inlikelihood(OBAMA.s:$(n)) and OBAMA_gammaShape.s:$(n)/estimate=true'/>

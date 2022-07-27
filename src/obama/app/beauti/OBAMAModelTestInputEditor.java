@@ -7,7 +7,13 @@ import java.util.List;
 
 import beastfx.app.inputeditor.BeautiDoc;
 import beastfx.app.inputeditor.SiteModelInputEditor;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import obama.sitemodel.OBAMAModelTestSiteModel;
 import obama.substitutionmodel.OBAMAModel;
 import obama.substitutionmodel.OBAMA_Blosum62;
@@ -69,19 +75,20 @@ public class OBAMAModelTestInputEditor extends SiteModelInputEditor {
 		OBAMAModel substModel = (OBAMAModel) sm;
 		List<EmpiricalSubstitutionModel> models = substModel.substModelInput.get();
 
-		int k = 3;
+		VBox box = (VBox)((HBox)pane.getChildren().get(0)).getChildren().get(0);
 		for (EmpiricalSubstitutionModel m : availableModels) {
-			addCheckBox(m, models, k++);
+			addCheckBox(m, models, box);
 		}
 		//validate();
 	}
 
-	private void addCheckBox(EmpiricalSubstitutionModel m, List<EmpiricalSubstitutionModel> models, int offset) {
+	private void addCheckBox(EmpiricalSubstitutionModel m, List<EmpiricalSubstitutionModel> models, VBox box) {
 		String modelName = m.getClass().getSimpleName();
 		String modelLabel = modelName;
 		if (modelLabel.startsWith("OBAMA_")) {
 			modelLabel = modelLabel.substring(6);
 		}
+	
 		CheckBox checkBox = new CheckBox(modelLabel);
 		checkBox.setId(modelName);
 		
@@ -98,7 +105,8 @@ public class OBAMAModelTestInputEditor extends SiteModelInputEditor {
 			String label = b.getId();
 			setModel(label, b.isSelected());
 		});
-		pane.getChildren().add(offset, checkBox);
+		checkBox.setPadding(new Insets(5));
+		box.getChildren().add(checkBox);
 	}
 
 	private void setModel(String label, boolean selected) {
