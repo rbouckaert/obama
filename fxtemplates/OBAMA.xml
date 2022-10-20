@@ -147,4 +147,158 @@ bmodeltest.math.distributions.NucleotideRevJumpSubstModelRatePrior.distr"
             </subtemplate>
     </mergewith>
 
+
+
+
+   <!--OBAMA for starbeast3 -->
+    <mergewith point='sb3SubstModelTemplates'>
+
+        <!-- site models -->
+        <!-- inputLabelMap='beast.evolution.sitemodel.OBAMAModelTestSiteModel.mutationRate=Substitution Rate'-->
+        <subtemplate id='OBAMA Bayesian Aminoacid Model Averaging' class='obama.sitemodel.OBAMAModelTestSiteModel' mainid='OBAMA.s:$(n)'
+
+            suppressInputs="obama.sitemodel.OBAMAModelTestSiteModel.substModel,
+obama.sitemodel.OBAMAModelTestSiteModel.gammaCategoryCount,
+obama.sitemodel.OBAMAModelTestSiteModel.shape,
+obama.sitemodel.OBAMAModelTestSiteModel.proportionInvariant,
+obama.sitemodel.OBAMAModelTestSiteModel.hasInvariantSites,
+obama.sitemodel.OBAMAModelTestSiteModel.hasGammaRates,
+bmodeltest.math.distributions.BMTPrior.x,
+bmodeltest.math.distributions.BMTPrior.count,
+bmodeltest.math.distributions.NucleotideRevJumpSubstModelRatePrior.substModel,
+bmodeltest.math.distributions.NucleotideRevJumpSubstModelRatePrior.x,
+bmodeltest.math.distributions.NucleotideRevJumpSubstModelRatePrior.modelIndicator,
+bmodeltest.math.distributions.NucleotideRevJumpSubstModelRatePrior.distr"
+            >
+            <![CDATA[
+
+        <stateNode id="OBAMA_ModelIndicator.s:$(n)" spec="parameter.IntegerParameter" lower="0" upper="14">0</stateNode>
+        <parameter id="OBAMA_gammaShape.s:$(n)" lower="0.1" name="stateNode">1.0</parameter>
+        <parameter id="OBAMA_ProportionInvariable.s:$(n)" lower="0.0" name="stateNode" upper="1.0">0.1</parameter>
+        <stateNode id="OBAMA_hasInvariableSites.s:$(n)" spec="parameter.IntegerParameter">1</stateNode>        
+        <stateNode id="OBAMA_hasGammaRates.s:$(n)" spec="parameter.IntegerParameter">1</stateNode>  
+        <parameter id="frequencies_OBAMA.s:$(n)" lower="0.0" upper="1.0" name="stateNode" dimension="20">0.05</parameter>
+
+        <!-- frequencies estimation -->
+        <stateNode id="OBAMA_useExternalFreqs.s:$(n)" spec="parameter.BooleanParameter">false</stateNode>
+
+
+        <distribution id="OBAMA_GammaShapePrior.s:$(n)" spec="bmodeltest.math.distributions.BMTPrior" count="@OBAMA_hasGammaRates.s:$(n)" x="@OBAMA_gammaShape.s:$(n)">
+                <Exponential id="Exponential.0" name="distr">
+                    <parameter lower="0.0" name="mean" upper="0.0" estimate='false'>1.0</parameter>
+                </Exponential>
+        </distribution>
+        
+        <distribution id="OBAMA_PropInvariablePrior.s:$(n)" spec="bmodeltest.math.distributions.BMTPrior" count="@OBAMA_hasInvariableSites.s:$(n)" x="@OBAMA_ProportionInvariable.s:$(n)">
+            <Beta name="distr" alpha="1.0" beta="4.0"/>
+        </distribution>
+
+        <prior id='OBAMA_MutationRatePrior.s:$(n)' x='@OBAMA_mutationRate.s:$(n)'><distr spec="OneOnX"/></prior>
+            
+        <prior id="OBAMA_freqsPrior.s:$(n)" name="distribution" x="@frequencies_OBAMA.s:$(n)">
+            <distr id="OBMAMA_Dirichlet" spec="beast.base.inference.distribution.Dirichlet">
+                <parameter id="RealParameter" spec="parameter.RealParameter" dimension="20" lower="0.0" name="alpha" upper="0.0">4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0
+                </parameter>
+            </distr>
+        </prior>
+
+        <siteModel id="OBAMA.s:$(n)" spec="obama.sitemodel.OBAMAModelTestSiteModel" 
+            gammaCategoryCount="4" proportionInvariant="@OBAMA_ProportionInvariable.s:$(n)" shape="@OBAMA_gammaShape.s:$(n)"
+            hasGammaRates="@OBAMA_hasGammaRates.s:$(n)" hasInvariantSites="@OBAMA_hasInvariableSites.s:$(n)">
+            <parameter id="OBAMA_mutationRate.s:$(n)" estimate="false" name="mutationRate">1.0</parameter>
+                <substModel id="OBAMA_substmodel.s:$(n)" spec="obama.substitutionmodel.OBAMAModel">
+                        <frequencies id="OBAMA_freqs.s:$(n)" spec="Frequencies" frequencies="@frequencies_OBAMA.s:$(n)"/>
+                        <useExternalFreqs idref="OBAMA_useExternalFreqs.s:$(n)"/>
+                        <modelIndicator idref="OBAMA_ModelIndicator.s:$(n)"/>
+                        <model id="OBAMA_Blosum62.0" spec="obama.substitutionmodel.OBAMA_Blosum62"/>
+                        <model id="OBAMA_CpREV.0" spec="obama.substitutionmodel.OBAMA_CpREV"/>
+                        <model id="OBAMA_DCMut.0" spec="obama.substitutionmodel.OBAMA_DCMut"/>
+                        <model id="OBAMA_Dayhoff.0" spec="obama.substitutionmodel.OBAMA_Dayhoff"/>
+                        <model id="OBAMA_FLU.0" spec="obama.substitutionmodel.OBAMA_FLU"/>
+                        <model id="OBAMA_HIVb.0" spec="obama.substitutionmodel.OBAMA_HIVb"/>
+                        <model id="OBAMA_HIVw.0" spec="obama.substitutionmodel.OBAMA_HIVw"/>
+                        <model id="OBAMA_JTT.0" spec="obama.substitutionmodel.OBAMA_JTT"/>
+                        <model id="OBAMA_LG.0" spec="obama.substitutionmodel.OBAMA_LG"/>
+                        <model id="OBAMA_MtArt.0" spec="obama.substitutionmodel.OBAMA_MtArt"/>
+                        <model id="OBAMA_MtREV.0" spec="obama.substitutionmodel.OBAMA_MtREV"/>
+                        <model id="OBAMA_MtMam.0" spec="obama.substitutionmodel.OBAMA_MtMam"/>
+                        <model id="OBAMA_RtREV.0" spec="obama.substitutionmodel.OBAMA_RtREV"/>
+                        <model id="OBAMA_VT.0" spec="obama.substitutionmodel.OBAMA_VT"/>
+                        <model id="OBAMA_WAG.0" spec="obama.substitutionmodel.OBAMA_WAG"/>
+                    </substModel>
+        </siteModel>
+    
+    
+        <operator id="OBAMA_hasGammaRatesFlipper.s:$(n)" spec="bmodeltest.evolution.operators.BMTBirthDeathOperator" count="@OBAMA_hasGammaRates.s:$(n)" rates="@OBAMA_gammaShape.s:$(n)" weight="0.1"/>
+        <operator id="OBAMA_gammaShapeScaler.s:$(n)" spec="bmodeltest.evolution.operators.BMTScaleOperator" count="@OBAMA_hasGammaRates.s:$(n)" parameter="@OBAMA_gammaShape.s:$(n)" scaleFactor="0.5" weight="0.05"/>
+
+        <operator id="OBAMA_hasInvariableSitesFlipper.s:$(n)" spec="bmodeltest.evolution.operators.BMTBirthDeathOperator" count="@OBAMA_hasInvariableSites.s:$(n)" rates="@OBAMA_ProportionInvariable.s:$(n)" weight="0.1"/>
+        <operator id="OBAMA_ProportionInvariableScaler.s:$(n)" spec="bmodeltest.evolution.operators.BMTScaleOperator" count="@OBAMA_hasInvariableSites.s:$(n)" parameter="@OBAMA_ProportionInvariable.s:$(n)" scaleFactor="0.5" weight="0.05"/>
+
+        <operator id='OBAMA_mutationRateScaler.s:$(n)' spec='kernel.BactrianScaleOperator' scaleFactor="0.1" weight="0.05" parameter="@OBAMA_mutationRate.s:$(n)"/>
+            
+        <operator id="OBAMA_ModelIndicatorUniformOperator.s:$(n)" spec="UniformOperator" parameter="@OBAMA_ModelIndicator.s:$(n)" weight="3.0"/>
+        <operator id="OBAMA_FreqsFlipOperator.s:$(n)" spec="BitFlipOperator" parameter="@OBAMA_useExternalFreqs.s:$(n)" weight="0.1"/>
+
+
+        <log id="OBAMA_ActivePropInvariable.s:$(n)" spec='bmodeltest.evolution.substitutionmodel.ActiveLogger'>
+                <parameter idref="OBAMA_ProportionInvariable.s:$(n)"/>
+                <mask idref="OBAMA_hasInvariableSites.s:$(n)"/>
+        </log>
+        <log id="OBAMA_ActiveGammaShape.s:$(n)" spec='bmodeltest.evolution.substitutionmodel.ActiveLogger'>
+                <parameter idref="OBAMA_gammaShape.s:$(n)"/>
+                <mask idref="OBAMA_hasGammaRates.s:$(n)"/>
+        </log>
+            
+        <operator id="OBAMA_FrequenciesAVMNOperator.s:$(n)" spec="beast.base.evolution.operator.kernel.AdaptableVarianceMultivariateNormalOperator" beta="0.05" burnin="500" initial="1000" weight="0.05">
+            <transformations id="LogConstrainedSumTransform.s:$(n)" spec="beast.base.inference.operator.kernel.Transform$LogConstrainedSumTransform">
+                <f idref="frequencies_OBAMA.s:$(n)"/>
+            </transformations>
+        </operator>
+            ]]>
+
+            <connect method="beastfx.app.inputeditor.SiteModelInputEditor.customConnector"/>
+
+            <connect srcID='OBAMA_ModelIndicator.s:$(n)'       targetID='state' inputName='stateNode' if='inlikelihood(OBAMA.s:$(n))'/>
+            <connect srcID='OBAMA_gammaShape.s:$(n)'           targetID='state' inputName='stateNode' if='inlikelihood(OBAMA.s:$(n)) and OBAMA_gammaShape.s:$(n)/estimate=true'/>
+            <connect srcID='OBAMA_ProportionInvariable.s:$(n)'  targetID='state' inputName='stateNode' if='inlikelihood(OBAMA.s:$(n)) and OBAMA_ProportionInvariable.s:$(n)/estimate=true'/>
+            <connect srcID='OBAMA_hasInvariableSites.s:$(n)'        targetID='state' inputName='stateNode' if='inlikelihood(OBAMA.s:$(n)) and OBAMA_hasInvariableSites.s:$(n)/estimate=true'/>
+            <connect srcID='OBAMA_hasGammaRates.s:$(n)'            targetID='state' inputName='stateNode' if='inlikelihood(OBAMA.s:$(n)) and OBAMA_hasGammaRates.s:$(n)/estimate=true'/>
+            <connect srcID='OBAMA_useExternalFreqs.s:$(n)'            targetID='state' inputName='stateNode' if='inlikelihood(OBAMA.s:$(n))'/>
+
+            <connect srcID='OBAMA_MutationRatePrior.s:$(n)'         targetID='prior' inputName='distribution' if='nooperator(FixMeanMutationRatesOperator) and inlikelihood(OBAMA_mutationRate.s:$(n)) and OBAMA_mutationRate.s:$(n)/estimate=true'/>
+            <connect srcID='OBAMA_mutationRate.s:$(n)'              targetID='state' inputName='stateNode' if='inlikelihood(OBAMA_mutationRate.s:$(n)) and OBAMA_mutationRate.s:$(n)/estimate=true'/>
+            <connect srcID='OBAMA_mutationRateScaler.s:$(n)'        targetID='mcmc' inputName='operator' if='nooperator(FixMeanMutationRatesOperator) and inlikelihood(OBAMA_mutationRate.s:$(n)) and OBAMA_mutationRate.s:$(n)/estimate=true'>Scales mutation rate of partition s:$(n)</connect>
+            <connect srcID='OBAMA_mutationRate.s:$(n)'              targetID='tracelog' inputName='log' if='inlikelihood(OBAMA_mutationRate.s:$(n)) and OBAMA_mutationRate.s:$(n)/estimate=true'/>
+
+            <connect srcID='OBAMA_freqsPrior.s:$(n)'                targetID='prior' inputName='distribution' if='inlikelihood(frequencies_OBAMA.s:$(n)) and frequencies_OBAMA.s:$(n)/estimate=true'/>
+            <connect srcID='frequencies_OBAMA.s:$(n)'               targetID='state' inputName='stateNode' if='inlikelihood(frequencies_OBAMA.s:$(n)) and frequencies_OBAMA.s:$(n)/estimate=true'/>
+            <connect srcID='OBAMA_FrequenciesAVMNOperator.s:$(n)'   targetID='mcmc' inputName='operator' if='inlikelihood(frequencies_OBAMA.s:$(n)) and frequencies_OBAMA.s:$(n)/estimate=true'>AVMN proposal for frequencies of partition s:$(n)</connect>
+            <connect srcID='frequencies_OBAMA.s:$(n)'               targetID='tracelog' inputName='log' if='inlikelihood(frequencies_OBAMA.s:$(n)) and frequencies_OBAMA.s:$(n)/estimate=true'/>
+            
+            <connect srcID='OBAMA_GammaShapePrior.s:$(n)'           targetID='prior' inputName='distribution' if='inlikelihood(OBAMA.s:$(n)) and OBAMA_gammaShape.s:$(n)/estimate=true'>Prior on gamma shape parameter for partition s:$(n)</connect>
+            <connect srcID='OBAMA_PropInvariablePrior.s:$(n)'        targetID='prior' inputName='distribution' if='inlikelihood(OBAMA.s:$(n)) and OBAMA_ProportionInvariable.s:$(n)/estimate=true'>Prior on proportion invariant for partition s:$(n)</connect>
+
+            <connect srcID='OBAMA_gammaShapeScaler.s:$(n)'          targetID='mcmc' inputName='operator' if='inlikelihood(OBAMA.s:$(n)) and OBAMA_gammaShape.s:$(n)/estimate=true'>Scales gamma shape parameter of partition s:$(n)</connect>
+            <connect srcID='OBAMA_ProportionInvariableScaler.s:$(n)' targetID='mcmc' inputName='operator' if='inlikelihood(OBAMA.s:$(n)) and OBAMA_ProportionInvariable.s:$(n)/estimate=true'>Scales proportion invariant of partition s:$(n)</connect>
+            <connect srcID='OBAMA_hasGammaRatesFlipper.s:$(n)'      targetID='mcmc' inputName='operator' if='inlikelihood(OBAMA.s:$(n)) and OBAMA_hasGammaRates.s:$(n)/estimate=true'>Switches gamma rates on/off of partition s:$(n)</connect>
+            <connect srcID='OBAMA_hasInvariableSitesFlipper.s:$(n)'  targetID='mcmc' inputName='operator' if='inlikelihood(OBAMA.s:$(n)) and OBAMA_hasInvariableSites.s:$(n)/estimate=true'>Switches invariant sites on/off of partition s:$(n)</connect>
+            <connect srcID='OBAMA_FreqsFlipOperator.s:$(n)'         targetID='mcmc' inputName='operator' if='inlikelihood(OBAMA.s:$(n))'>Switches equal frequencies of partition s:$(n)</connect>
+            <connect srcID="OBAMA_ModelIndicatorUniformOperator.s:$(n)" targetID='mcmc' inputName='operator' if='inlikelihood(OBAMA.s:$(n))'>Resersible jump of subst models for partition s:$(n)</connect>
+
+            <connect srcID='OBAMA_ModelIndicator.s:$(n)'            targetID='tracelog' inputName='log' if='inlikelihood(OBAMA.s:$(n))'/>
+            <connect srcID='OBAMA_gammaShape.s:$(n)'                targetID='tracelog' inputName='log' if='inlikelihood(OBAMA.s:$(n))'/>
+            <connect srcID='OBAMA_ProportionInvariable.s:$(n)'       targetID='tracelog' inputName='log' if='inlikelihood(OBAMA.s:$(n))'/>
+            <connect srcID='OBAMA_hasGammaRates.s:$(n)'                 targetID='tracelog' inputName='log' if='inlikelihood(OBAMA.s:$(n))'/>
+            <connect srcID='OBAMA_hasInvariableSites.s:$(n)'             targetID='tracelog' inputName='log' if='inlikelihood(OBAMA.s:$(n))'/>
+            <connect srcID='OBAMA_ActivePropInvariable.s:$(n)'           targetID='tracelog' inputName='log' if='inlikelihood(OBAMA.s:$(n))'/>
+            <connect srcID='OBAMA_ActiveGammaShape.s:$(n)'              targetID='tracelog' inputName='log' if='inlikelihood(OBAMA.s:$(n))'/>
+            <connect srcID='OBAMA_useExternalFreqs.s:$(n)'                 targetID='tracelog' inputName='log' if='inlikelihood(OBAMA.s:$(n))'/>
+
+            </subtemplate>
+    </mergewith>
+
+
+
+
 </beast>
