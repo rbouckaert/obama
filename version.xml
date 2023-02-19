@@ -31,6 +31,12 @@
         <provider classname="obama.substitutionmodel.ParameterisedAminoAcidModel"/>
         <provider classname="obama.substitutionmodel.PHAT"/>
         <provider classname="obama.Transition"/>
+
+        <provider classname="obama.sitemodel.MixtureSiteModel"/>
+        <provider classname="obama.substitutionmodel.mixture.M1"/>
+        <provider classname="obama.substitutionmodel.mixture.M2"/>
+        <provider classname="obama.substitutionmodel.mixture.M3"/>
+        <provider classname="obama.substitutionmodel.mixture.M4"/>
     </service>
 
     <service type="beastfx.app.inputeditor.InputEditor">

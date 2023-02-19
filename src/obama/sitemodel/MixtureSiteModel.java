@@ -14,45 +14,55 @@ import beast.base.inference.parameter.RealParameter;
 
 @Description("Site model that is a mixture of various substitution models")
 public class MixtureSiteModel extends SiteModelInterface.Base {
-	final public Input<RealParameter> weightVectorInput = new Input<>("weights", "mixture weights that determine contribution of each category. "
+	final public Input<RealParameter> weightVectorInput = new Input<>("weights", "mixture weights that determine contribution of each mixture component. "
 			+ "Equal weights if not specified.");
-	final public Input<RealParameter> rateVectorInput = new Input<>("rates", "mixture rates that specify rate of each category. "
-			+ "Equal rates if not specified.");
-	final public Input<List<SubstitutionModel>> substModelInput = 
-            new Input<>("substModel", "set of substitution models along branches in the beast.tree", new ArrayList<>(), Validate.REQUIRED);
+	final public Input<RealParameter> rateVectorInput = new Input<>("rates", "mixture rates that specify rate of each mixture component. "
+			+ "All rates set to 1.0 if not specified.");
+	final public Input<List<SubstitutionModel>> mixtureComponentInput = 
+            new Input<>("component", "set of substitution models along branches in the beast.tree", new ArrayList<>(), Validate.REQUIRED);
+    final public Input<RealParameter> muParameterInput = new Input<>("mutationRate", "mutation rate (defaults to 1.0)");
 
-	RealParameter weightVector;
-	RealParameter rateVector;
-	List<SubstitutionModel> substModels;
+	protected RealParameter weightVector;
+	protected RealParameter rateVector;
+	protected RealParameter muParameter;
+	protected List<SubstitutionModel> mixtureComponent;
+	
+	public MixtureSiteModel() {
+		substModelInput.setRule(Validate.OPTIONAL);
+	}
 	
 	@Override
 	public void initAndValidate() {
-		substModels = substModelInput.get();
+		mixtureComponent = mixtureComponentInput.get();
 
+		muParameter = muParameterInput.get();
+		if (muParameter == null) {
+			muParameter = new RealParameter("1.0");
+		}
 		// pick up weights
 		weightVector = weightVectorInput.get();
 		if (weightVector == null) {
-			Double [] weights = new Double[substModels.size()];
+			Double [] weights = new Double[mixtureComponent.size()];
 			for (int i = 0; i < weights.length; i++) {
 				weights[i] = 1.0 / weights.length;
 			}
 			weightVector = new RealParameter(weights);
-		} else if (weightVector.getDimension() != substModels.size()) {
+		} else if (weightVector.getDimension() != mixtureComponent.size()) {
 			throw new IllegalArgumentException("dimension of weights (" + weightVector.getDimension() + ") should be the same "
-					+ "as number of mixture components (" + substModels.size() + ")");
+					+ "as number of mixture components (" + mixtureComponent.size() + ")");
 		}
 
 		// pick up rates
 		rateVector = rateVectorInput.get();
 		if (rateVector == null) {
-			Double [] rates = new Double[substModels.size()];
+			Double [] rates = new Double[mixtureComponent.size()];
 			for (int i = 0; i < rates.length; i++) {
 				rates[i] = 1.0;
 			}
 			rateVector = new RealParameter(rates);
-		} else if (rateVector.getDimension() != substModels.size()) {
+		} else if (rateVector.getDimension() != mixtureComponent.size()) {
 			throw new IllegalArgumentException("dimension of rates (" + rateVector.getDimension() + ") should be the same "
-					+ "as number of mixture components (" + substModels.size() + ")");
+					+ "as number of mixture components (" + mixtureComponent.size() + ")");
 		}
 		
         boolean forceJava = Boolean.valueOf(System.getProperty("java.only"));
@@ -68,8 +78,8 @@ public class MixtureSiteModel extends SiteModelInterface.Base {
 	@Override
 	public void getTransitionProbabilities(Node node, double startTime, double endTime, int category, double rate,
 			double[] matrix) {
-    	final double jointBranchRate = getRateForCategory(category, node) * rate;
-		substModels.get(category).getTransitionProbabilities(node, startTime, endTime, jointBranchRate, matrix);
+    	final double jointBranchRate = getRateForCategory(category, node) * rate * muParameter.getValue();
+		mixtureComponent.get(category).getTransitionProbabilities(node, startTime, endTime, jointBranchRate, matrix);
 	}
 	
 	@Override
@@ -79,7 +89,7 @@ public class MixtureSiteModel extends SiteModelInterface.Base {
 
 	@Override
 	public int getCategoryCount() {
-		return substModels.size();
+		return mixtureComponent.size();
 	}
 
 	@Override
