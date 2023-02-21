@@ -7,10 +7,14 @@ import beast.base.core.Description;
 import beast.base.core.Input;
 import beast.base.core.Input.Validate;
 import beast.base.core.Log;
+import beast.base.evolution.likelihood.GenericTreeLikelihood;
+import beast.base.evolution.likelihood.ThreadedTreeLikelihood;
+import beast.base.evolution.likelihood.TreeLikelihood;
 import beast.base.evolution.sitemodel.SiteModelInterface;
 import beast.base.evolution.substitutionmodel.SubstitutionModel;
 import beast.base.evolution.tree.Node;
 import beast.base.inference.parameter.RealParameter;
+import obama.likelihood.MixtureTreeLikelihood;
 
 @Description("Site model that is a mixture of various substitution models")
 public class MixtureSiteModel extends SiteModelInterface.Base {
@@ -72,10 +76,22 @@ public class MixtureSiteModel extends SiteModelInterface.Base {
         	Log.warning("== WARNING: Turn off BEAGLE using the -java flag for BEAST ==");
         	Log.warning("=============================================================");
         }
+        
+        
+        for (Object o :  getOutputs()) {
+        	if (o instanceof TreeLikelihood) {
+        		TreeLikelihood tl = (TreeLikelihood) o;
+        		tl.implementationInput.setValue(MixtureTreeLikelihood.class.getName(), tl);
+        	}
+        	if (o instanceof GenericTreeLikelihood && !(o instanceof MixtureTreeLikelihood)) {
+        		// ThreadedTreeLikelihood tl = (ThreadedTreeLikelihood) o;
+        		// tl.implementationInput.setValue(MixtureTreeLikelihood.class.getName(), tl);
+        		throw new IllegalArgumentException("Expected MixtureSiteModel in " + MixtureTreeLikelihood.class.getName() + " not " + o.getClass().getName());
+        	}
+        }
 	}
 
 	
-	@Override
 	public void getTransitionProbabilities(Node node, double startTime, double endTime, int category, double rate,
 			double[] matrix) {
     	final double jointBranchRate = getRateForCategory(category, node) * rate * muParameter.getValue();
@@ -117,5 +133,9 @@ public class MixtureSiteModel extends SiteModelInterface.Base {
 		return weightVector.getDoubleValues();
 	}
 
+	@Override	
+	public boolean hasImaginaryEigenvectors() {
+		return true;
+	}
 }
 	

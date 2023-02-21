@@ -37,6 +37,8 @@
         <provider classname="obama.substitutionmodel.mixture.M2"/>
         <provider classname="obama.substitutionmodel.mixture.M3"/>
         <provider classname="obama.substitutionmodel.mixture.M4"/>
+        <provider classname="obama.likelihood.MixtureTreeLikelihood"/>
+        <provider classname="obama.operator.FreeRateOperator"/>
     </service>
 
     <service type="beastfx.app.inputeditor.InputEditor">

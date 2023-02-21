@@ -61,7 +61,7 @@ name="alignment">
             </prior>
         </distribution>
         <distribution id="likelihood" spec="beast.base.inference.CompoundDistribution" useThreads="true">
-            <distribution id="treeLikelihood.protein" spec="ThreadedTreeLikelihood" data="@protein" tree="@Tree.t:protein">
+            <distribution id="treeLikelihood.protein" spec="obama.likelihood.MixtureTreeLikelihood" data="@protein" tree="@Tree.t:protein">
                 <siteModel id="LG4.s:protein" spec="obama.sitemodel.MixtureSiteModel">
                     <parameter id="mutationRate.s:protein" estimate="false" name="mutationRate">1.0</parameter>
                     <rates spec="parameter.RealParameter" value="0.197063 0.750275 1.951569 5.161586"/>
@@ -94,7 +94,7 @@ name="alignment">
 
     <operator id="YuleModelWilsonBalding.t:protein" spec="WilsonBalding" tree="@Tree.t:protein" weight="3.0"/>
 
-    <logger id="tracelog" fileName="protein.log" logEvery="1000" model="@posterior" sanitiseHeaders="true" sort="smart">
+    <logger id="tracelog" fileName="$(filebase).log" logEvery="1000" model="@posterior" sanitiseHeaders="true" sort="smart">
         <log idref="posterior"/>
         <log idref="likelihood"/>
         <log idref="prior"/>
@@ -111,7 +111,7 @@ name="alignment">
         <log idref="prior"/>
     </logger>
 
-    <logger id="treelog.t:protein" fileName="$(tree).trees" logEvery="1000" mode="tree">
+    <logger id="treelog.t:protein" fileName="$(filebase).trees" logEvery="1000" mode="tree">
         <log id="TreeWithMetaDataLogger.t:protein" spec="beast.base.evolution.TreeWithMetaDataLogger" tree="@Tree.t:protein"/>
     </logger>
 

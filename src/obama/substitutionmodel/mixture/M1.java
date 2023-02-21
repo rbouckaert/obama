@@ -44,7 +44,8 @@ public class M1 extends EmpiricalSubstitutionModel {
         Aminoacid dataType = new Aminoacid();
         String codeMap = dataType.getCodeMap();
         int[] codeMapNrs = new int[dataType.getStateCount()];
-        String encoding = "ACDEFGHIKLMNPQRSTVWY";
+        //String encoding = "ACDEFGHIKLMNPQRSTVWY";
+        String encoding = "ARNDCQEGHILKMFPSTWYV";
         for (int i = 0; i < dataType.getStateCount(); i++) {
             codeMapNrs[i] = encoding.indexOf(codeMap.charAt(i));
         }
