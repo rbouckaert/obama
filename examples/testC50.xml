@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><beast beautitemplate='Standard' beautistatus='' namespace=":beast.pkgmgmt:beast.base.core:beast.base.inference:beast.base.evolution.alignment:beast.base.evolution.tree.coalescent:beast.base.util:beast.base.math:beast.evolution.nuc:beast.base.evolution.operator:beast.base.inference.operator:beast.base.evolution.sitemodel:beast.base.evolution.substitutionmodel:beast.base.evolution.likelihood" required="" version="2.4">
+
+
+    <data
+id="protein"
+dataType="aminoacid"
+name="alignment">
+                    <sequence id="seq_Cow" taxon="Cow" totalcount="20" value="MAYPMQLGFQDATSPIMEELLHFHDHTLMIVFLISSLVLYIISLMLTTKLTHTSTMDAQEVETIWTILPAIILILIALPSLRILYMMDEINNPSLTVKTMGHQWYWSYEYTDYEDLSFDSYMIPTSELKPGELRLLEVDNRVVLPMEMTIRMLVSSEDVLHSWAVPSLGLKTDAIPGRLNQTTLMSSRPGLYYGQCSEICGSNHSFMPIVLELVPLKYFEKWSASML-------"/>
+                    <sequence id="seq_Carp" taxon="Carp" totalcount="20" value="MAHPTQLGFKDAAMPVMEELLHFHDHALMIVLLISTLVLYIITAMVSTKLTNKYILDSQEIEIVWTILPAVILVLIALPSLRILYLMDEINDPHLTIKAMGHQWYWSYEYTDYENLGFDSYMVPTQDLAPGQFRLLETDHRMVVPMESPVRVLVSAEDVLHSWAVPSLGVKMDAVPGRLNQAAFIASRPGVFYGQCSEICGANHSFMPIVVEAVPLEHFENWSSLMLEDASLGS"/>
+                    <sequence id="seq_Chicken" taxon="Chicken" totalcount="20" value="MANHSQLGFQDASSPIMEELVEFHDHALMVALAICSLVLYLLTLMLMEKLS-SNTVDAQEVELIWTILPAIVLVLLALPSLQILYMMDEIDEPDLTLKAIGHQWYWTYEYTDFKDLSFDSYMTPTTDLPLGHFRLLEVDHRIVIPMESPIRVIITADDVLHSWAVPALGVKTDAIPGRLNQTSFITTRPGVFYGQCSEICGANHSYMPIVVESTPLKHFEAWSSL------LSS"/>
+                    <sequence id="seq_Human" taxon="Human" totalcount="20" value="MAHAAQVGLQDATSPIMEELITFHDHALMIIFLICFLVLYALFLTLTTKLTNTNISDAQEMETVWTILPAIILVLIALPSLRILYMTDEVNDPSLTIKSIGHQWYWTYEYTDYGGLIFNSYMLPPLFLEPGDLRLLDVDNRVVLPIEAPIRMMITSQDVLHSWAVPTLGLKTDAIPGRLNQTTFTATRPGVYYGQCSEICGANHSFMPIVLELIPLKIFEM-------GPVFTL"/>
+                    <sequence id="seq_Loach" taxon="Loach" totalcount="20" value="MAHPTQLGFQDAASPVMEELLHFHDHALMIVFLISALVLYVIITTVSTKLTNMYILDSQEIEIVWTVLPALILILIALPSLRILYLMDEINDPHLTIKAMGHQWYWSYEYTDYENLSFDSYMIPTQDLTPGQFRLLETDHRMVVPMESPIRILVSAEDVLHSWALPAMGVKMDAVPGRLNQTAFIASRPGVFYGQCSEICGANHSFMPIVVEAVPLSHFENWSTLMLKDASLGS"/>
+                    <sequence id="seq_Mouse" taxon="Mouse" totalcount="20" value="MAYPFQLGLQDATSPIMEELMNFHDHTLMIVFLISSLVLYIISLMLTTKLTHTSTMDAQEVETIWTILPAVILIMIALPSLRILYMMDEINNPVLTVKTMGHQWYWSYEYTDYEDLCFDSYMIPTNDLKPGELRLLEVDNRVVLPMELPIRMLISSEDVLHSWAVPSLGLKTDAIPGRLNQATVTSNRPGLFYGQCSEICGSNHSFMPIVLEMVPLKYFENWSASMI-------"/>
+                    <sequence id="seq_Rat" taxon="Rat" totalcount="20" value="MAYPFQLGLQDATSPIMEELTNFHDHTLMIVFLISSLVLYIISLMLTTKLTHTSTMDAQEVETIWTILPAVILILIALPSLRILYMMDEINNPVLTVKTMGHQWYWSYEYTDYEDLCFDSYMIPTNDLKPGELRLLEVDNRVVLPMELPIRMLISSEDVLHSWAIPSLGLKTDAIPGRLNQATVTSNRPGLFYGQCSEICGSNHSFMPIVLEMVPLKYFENWSASMI-------"/>
+                    <sequence id="seq_Seal" taxon="Seal" totalcount="20" value="MAYPLQMGLQDATSPIMEELLHFHDHTLMIVFLISSLVLYIISLMLTTKLTHTSTMDAQEVETVWTILPAIILILIALPSLRILYMMDEINNPSLTVKTMGHQWYWSYEYTDYEDLNFDSYMIPTQELKPGELRLLEVDNRVVLPMEMTIRMLISSEDVLHSWAVPSLGLKTDAIPGRLNQTTLMTMRPGLYYGQCSEICGSNHSFMPIVLELVPLSHFEKWSTSML-------"/>
+                    <sequence id="seq_Whale" taxon="Whale" totalcount="20" value="MAYPFQLGFQDAASPIMEELLHFHDHTLMIVFLISSLVLYIITLMLTTKLTHTSTMDAQEVETVWTILPAIILILIALPSLRILYMMDEVNNPSLTVKTMGHQWYWSYEYTDYEDLSFDSYMIPTSDLKPGELRLLEVDNRVVLPMEMTIRMLVSSEDVLHSWAVPSLGLKTDAIPGRLNQTTLMSTRPGLFYGQCSEICGSNHSFMPIVLELVPLEVFEKWSVSML-------"/>
+                    <sequence id="seq_Frog" taxon="Frog" totalcount="20" value="MAHPSQLGFQDAASPIMEELLHFHDHTLMAVFLISTLVLYIITIMMTTKLTNTNLMDAQEIEMVWTIMPAISLIMIALPSLRILYLMDEVNDPHLTIKAIGHQWYWSYEYTNYEDLSFDSYMIPTNDLTPGQFRLLEVDNRMVVPMESPTRLLVTAEDVLHSWAVPSLGVKTDAIPGRLHQTSFIATRPGVFYGQCSEICGANHSFMPIVVEAVPLTDFENWSSSML-EASL--"/>
+                </data>
+
+
+    
+
+
+    
+
+
+    
+<map name="Uniform" >beast.base.inference.distribution.Uniform</map>
+<map name="Exponential" >beast.base.inference.distribution.Exponential</map>
+<map name="LogNormal" >beast.base.inference.distribution.LogNormalDistributionModel</map>
+<map name="Normal" >beast.base.inference.distribution.Normal</map>
+<map name="Beta" >beast.base.inference.distribution.Beta</map>
+<map name="Gamma" >beast.base.inference.distribution.Gamma</map>
+<map name="LaplaceDistribution" >beast.base.inference.distribution.LaplaceDistribution</map>
+<map name="prior" >beast.base.inference.distribution.Prior</map>
+<map name="InverseGamma" >beast.base.inference.distribution.InverseGamma</map>
+<map name="OneOnX" >beast.base.inference.distribution.OneOnX</map>
+
+
+<run id="mcmc" spec="MCMC" chainLength="10000000">
+    <state id="state" storeEvery="5000">
+        <tree id="Tree.t:protein" name="stateNode">
+            <taxonset id="TaxonSet.protein" spec="TaxonSet">
+                <alignment idref="protein"/>
+            </taxonset>
+        </tree>
+        <parameter id="birthRate.t:protein" name="stateNode">1.0</parameter>
+        <stateNode idref="freeRateRates.s:protein"/>
+        <stateNode idref="freeRateWeights.s:protein"/>
+    </state>
+
+    <init id="RandomTree.t:protein" spec="beast.base.evolution.tree.coalescent.RandomTree" estimate="false" initial="@Tree.t:protein" taxa="@protein">
+        <populationModel id="ConstantPopulation0.t:protein" spec="ConstantPopulation">
+            <parameter id="randomPopSize.t:protein" name="popSize">1.0</parameter>
+        </populationModel>
+    </init>
+
+    <distribution id="posterior" spec="beast.base.inference.CompoundDistribution">
+        <distribution id="prior" spec="beast.base.inference.CompoundDistribution">
+            <distribution id="YuleModel.t:protein" spec="beast.base.evolution.speciation.YuleModel" birthDiffRate="@birthRate.t:protein" tree="@Tree.t:protein"/>
+            <prior id="YuleBirthRatePrior.t:protein" name="distribution" x="@birthRate.t:protein">
+                <Uniform id="Uniform.1" name="distr" upper="Infinity"/>
+            </prior>
+            
+            <prior id="weightPrior.s:protein" x="@freeRateWeights.s:protein" name="distribution">
+            	<distr spec="beast.base.inference.distribution.Dirichlet" alpha="
+            	4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0
+            	4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0
+            	4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0
+            	4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 
+            	4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0"/>
+            </prior>
+            
+        </distribution>
+        <distribution id="likelihood" spec="beast.base.inference.CompoundDistribution" useThreads="true">
+            <distribution id="treeLikelihood.protein" spec="obama.likelihood.MixtureTreeLikelihood" data="@protein" tree="@Tree.t:protein">
+                <siteModel id="c50.s:protein" spec="obama.sitemodel.C50SiteModel">
+                    <parameter id="mutationRate.s:protein" estimate="false" name="mutationRate">1.0</parameter>
+                    <rates     id="freeRateRates.s:protein"   spec="parameter.RealParameter" lower="0.0" dimension="50" value="1.0"/>
+                    <weights   id="freeRateWeights.s:protein" spec="parameter.RealParameter" lower="0.0" upper="1.0" value="0.00509464 0.00753314 0.0595801 0.0100458 0.0109109 0.0427412 0.00632106 0.0192362 0.0119168 0.0154209 0.0148037 0.014293 0.0164064 0.0272538 0.0178737 0.0125183 0.00698661 0.0140027 0.0140399 0.0109043 0.011579 0.0138661 0.0377329 0.0118586 0.0356688 0.0161327 0.0200601 0.0133087 0.0357641 0.0119353 0.0241183 0.0243098 0.0178039 0.0200988 0.00579569 0.0397441 0.0240799 0.00868054 0.0239822 0.042803 0.0335193 0.00636191 0.0547546 0.00544598 0.0354219 0.0120158 0.0047506 0.036392 0.0270346 0.00709747"/>
+                    <substModel spec="MTREV"/>
+                </siteModel>
+                <branchRateModel id="StrictClock.c:protein" spec="beast.base.evolution.branchratemodel.StrictClockModel">
+                    <parameter id="clockRate.c:protein" estimate="false" name="clock.rate">1.0</parameter>
+                </branchRateModel>
+            </distribution>
+        </distribution>
+    </distribution>
+
+    <!-- operator for FreeRateModel  that ensures average weighted rate is 1 -->
+    <operator id="FreeRateOperator.s:protein" spec="obama.operator.FreeRateOperator" rates="@freeRateRates.s:protein" weights="@freeRateWeights.s:protein" weight="5.0"/>
+
+    <operator id="YuleBirthRateScaler.t:protein" spec="ScaleOperator" parameter="@birthRate.t:protein" scaleFactor="0.75" weight="3.0"/>
+
+    <operator id="YuleModelTreeScaler.t:protein" spec="ScaleOperator" scaleFactor="0.5" tree="@Tree.t:protein" weight="3.0"/>
+
+    <operator id="YuleModelTreeRootScaler.t:protein" spec="ScaleOperator" rootOnly="true" scaleFactor="0.5" tree="@Tree.t:protein" weight="3.0"/>
+
+    <operator id="YuleModelUniformOperator.t:protein" spec="Uniform" tree="@Tree.t:protein" weight="30.0"/>
+
+    <operator id="YuleModelSubtreeSlide.t:protein" spec="SubtreeSlide" tree="@Tree.t:protein" weight="15.0"/>
+
+    <operator id="YuleModelNarrow.t:protein" spec="Exchange" tree="@Tree.t:protein" weight="15.0"/>
+
+    <operator id="YuleModelWide.t:protein" spec="Exchange" isNarrow="false" tree="@Tree.t:protein" weight="3.0"/>
+
+    <operator id="YuleModelWilsonBalding.t:protein" spec="WilsonBalding" tree="@Tree.t:protein" weight="3.0"/>
+
+    <logger id="tracelog" fileName="$(filebase).log" logEvery="1000" model="@posterior" sanitiseHeaders="true" sort="smart">
+        <log idref="posterior"/>
+        <log idref="likelihood"/>
+        <log idref="prior"/>
+        <log idref="treeLikelihood.protein"/>
+        <log id="TreeHeight.t:protein" spec="beast.base.evolution.tree.TreeHeightLogger" tree="@Tree.t:protein"/>
+        <log idref="YuleModel.t:protein"/>
+        <log idref="birthRate.t:protein"/>
+        <log idref="freeRateWeights.s:protein"/>
+        <log idref="freeRateRates.s:protein"/>
+    </logger>
+
+    <logger id="screenlog" logEvery="1000">
+        <log idref="posterior"/>
+        <log id="ESS.0" spec="util.ESS" arg="@posterior"/>
+        <log idref="likelihood"/>
+        <log idref="prior"/>
+    </logger>
+
+    <logger id="treelog.t:protein" fileName="$(filebase).trees" logEvery="1000" mode="tree">
+        <log id="TreeWithMetaDataLogger.t:protein" spec="beast.base.evolution.TreeWithMetaDataLogger" tree="@Tree.t:protein"/>
+    </logger>
+
+</run>
+
+</beast>
