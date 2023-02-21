@@ -1,9 +1,9 @@
 package obama.likelihood;
 
+
 import java.util.List;
 
 import beast.base.inference.CalculationNode;
-import beast.base.inference.parameter.RealParameter;
 import obama.sitemodel.MixtureSiteModel;
 import beast.base.evolution.likelihood.TreeLikelihood;
 import beast.base.evolution.substitutionmodel.SubstitutionModel;
@@ -35,7 +35,7 @@ public class MixtureTreeLikelihood extends TreeLikelihood {
 		outPartials = new double[nrOfMatrices * nrOfStates * nrOfPatterns];
 		
 		if (m_siteModel instanceof MixtureSiteModel) {
-			substModels = ((MixtureSiteModel) m_siteModel).mixtureComponentInput.get();
+			substModels = ((MixtureSiteModel) m_siteModel).getMixtureComponents();
 		} else {
 			throw new IllegalArgumentException("Expected site model to be of type MixtureSiteModel");
 		}

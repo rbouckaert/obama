@@ -1,5 +1,6 @@
 package obama.sitemodel;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +9,6 @@ import beast.base.core.Input;
 import beast.base.core.Input.Validate;
 import beast.base.core.Log;
 import beast.base.evolution.likelihood.GenericTreeLikelihood;
-import beast.base.evolution.likelihood.ThreadedTreeLikelihood;
 import beast.base.evolution.likelihood.TreeLikelihood;
 import beast.base.evolution.sitemodel.SiteModelInterface;
 import beast.base.evolution.substitutionmodel.SubstitutionModel;
@@ -37,7 +37,7 @@ public class MixtureSiteModel extends SiteModelInterface.Base {
 	
 	@Override
 	public void initAndValidate() {
-		mixtureComponent = mixtureComponentInput.get();
+		mixtureComponent = initialiseMixtureComponents();
 
 		muParameter = muParameterInput.get();
 		if (muParameter == null) {
@@ -90,12 +90,19 @@ public class MixtureSiteModel extends SiteModelInterface.Base {
         	}
         }
 	}
-
+	
+    protected List<SubstitutionModel> initialiseMixtureComponents() {
+    	return mixtureComponentInput.get();
+    }
 	
 	public void getTransitionProbabilities(Node node, double startTime, double endTime, int category, double rate,
 			double[] matrix) {
     	final double jointBranchRate = getRateForCategory(category, node) * rate * muParameter.getValue();
 		mixtureComponent.get(category).getTransitionProbabilities(node, startTime, endTime, jointBranchRate, matrix);
+	}
+	
+	public List<SubstitutionModel> getMixtureComponents() {
+		return mixtureComponent;
 	}
 	
 	@Override
