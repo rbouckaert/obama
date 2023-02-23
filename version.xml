@@ -27,7 +27,9 @@
         <provider classname="obama.substitutionmodel.OBAMA_RtREV"/>
         <provider classname="obama.substitutionmodel.OBAMA_VT"/>
         <provider classname="obama.substitutionmodel.OBAMA_WAG"/>
+        <provider classname="obama.substitutionmodel.OBAMA_AsymPfam"/>
         <provider classname="obama.substitutionmodel.OBAMAModel"/>
+        <provider classname="obama.substitutionmodel.OBAMAComplexModel"/>
         <provider classname="obama.substitutionmodel.ParameterisedAminoAcidModel"/>
         <provider classname="obama.substitutionmodel.PHAT"/>
         <provider classname="obama.Transition"/>
