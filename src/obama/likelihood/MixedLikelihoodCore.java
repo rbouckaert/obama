@@ -1,9 +1,5 @@
 package obama.likelihood;
 
-import java.util.Arrays;
-
-import beast.base.evolution.likelihood.LikelihoodCore;
-
 /**
  * standard likelihood core, uses no caching *
  */
@@ -237,14 +233,16 @@ public class MixedLikelihoodCore {
      * @param outLogLikelihoods an array into which the likelihoods will go
      */
 
-	public void calculateLogLikelihoods(double[] partials, double[] frequencies, double[] outLogLikelihoods) {
+	public void calculateLogLikelihoods(int nodeIndex, double[][] frequencies, double[] outLogLikelihoods, int[] matrixIndex) {
+		double [] partials = this.partials[currentPartialsIndex[nodeIndex]][nodeIndex];
         int v = 0;
         for (int k = 0; k < nrOfPatterns; k++) {
 
             double sum = 0.0;
+            double [] freqs = frequencies[matrixIndex[k]];
             for (int i = 0; i < nrOfStates; i++) {
 
-                sum += frequencies[i] * partials[v];
+                sum += freqs[i] * partials[v];
                 v++;
             }
             outLogLikelihoods[k] = Math.log(sum) + getLogScalingFactor(k);
@@ -453,6 +451,12 @@ public class MixedLikelihoodCore {
      * @param matrixMap  a map of which matrix to use for each pattern (can be null if integrating over categories)
      */
     public void calculatePartials(int nodeIndex1, int nodeIndex2, int nodeIndex3, int[] matrixMap) {
+    	
+    	System.arraycopy(
+    			partials[1-currentPartialsIndex[nodeIndex3]][nodeIndex3], 0,
+    			partials[currentPartialsIndex[nodeIndex3]][nodeIndex3], 0, 
+    			partials[currentPartialsIndex[nodeIndex3]][nodeIndex3].length);
+    	
         if (states[nodeIndex1] != null) {
             if (states[nodeIndex2] != null) {
                 calculateStatesStatesPruning(

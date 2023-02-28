@@ -35,7 +35,6 @@ import beast.base.evolution.alignment.Alignment;
 import beast.base.evolution.branchratemodel.BranchRateModel;
 import beast.base.evolution.branchratemodel.StrictClockModel;
 import beast.base.evolution.likelihood.GenericTreeLikelihood;
-import beast.base.evolution.likelihood.LikelihoodCore;
 import beast.base.evolution.sitemodel.SiteModel;
 import beast.base.evolution.substitutionmodel.Frequencies;
 import beast.base.evolution.substitutionmodel.SubstitutionModel;
@@ -55,6 +54,10 @@ public class MixedTreeLikelihood extends GenericTreeLikelihood {
     final public Input<Scaling> scaling = new Input<>("scaling", "type of scaling to use, one of " + Arrays.toString(Scaling.values()) + ". If not specified, the -beagle_scaling flag is used.", Scaling._default, Scaling.values());
 
     final public Input<Frequencies> rootFrequenciesInput = new Input<>("rootFrequencies", "prior state frequencies at root, optional", Input.Validate.OPTIONAL);
+
+    
+    final public Input<Boolean> useSitesNotPatternsInput = new Input<>("useSitesNotPatterns", "Flag to indicate that sites with the same pattern are allowed to use different components. "
+    		+ "This is much slower than using patterns, and putting each pattern in the same component", true);
 
     /**
      * calculation engine *
@@ -160,7 +163,7 @@ public class MixedTreeLikelihood extends GenericTreeLikelihood {
         storedBranchLengths = new double[nodeCount];
 
         int stateCount = dataInput.get().getMaxStateCount();
-        int patterns = dataInput.get().getPatternCount();
+        int patterns = getPatternCount();
         likelihoodCore = createLikelihoodCore(stateCount);
 
         String className = getClass().getSimpleName();
@@ -187,6 +190,9 @@ public class MixedTreeLikelihood extends GenericTreeLikelihood {
 
         if (dataInput.get().isAscertained) {
             useAscertainedSitePatterns = true;
+            if (useSitesNotPatternsInput.get()) {
+            	setupAscertainmentSites();
+            }
         }
         
         matrixIndex = new int[patterns];
@@ -234,9 +240,10 @@ public class MixedTreeLikelihood extends GenericTreeLikelihood {
 
     protected void initCore() {
         final int nodeCount = treeInput.get().getNodeCount();
+        
         likelihoodCore.initialize(
                 nodeCount,
-                dataInput.get().getPatternCount(),
+                getPatternCount(),
                 m_siteModel.getCategoryCount(),
                 true, m_useAmbiguities.get()
         );
@@ -245,9 +252,9 @@ public class MixedTreeLikelihood extends GenericTreeLikelihood {
         final int intNodeCount = nodeCount / 2;
 
         if (m_useAmbiguities.get() || m_useTipLikelihoods.get()) {
-            setPartials(treeInput.get().getRoot(), dataInput.get().getPatternCount());
+            setPartials(treeInput.get().getRoot(), getPatternCount());
         } else {
-            setStates(treeInput.get().getRoot(), dataInput.get().getPatternCount());
+            setStates(treeInput.get().getRoot(), getPatternCount());
         }
         hasDirt = Tree.IS_FILTHY;
         for (int i = 0; i < intNodeCount; i++) {
@@ -255,7 +262,10 @@ public class MixedTreeLikelihood extends GenericTreeLikelihood {
         }
     }
 
-    /**
+    private int getPatternCount() {
+    	return useSitesNotPatternsInput.get() ? dataInput.get().getSiteCount() : dataInput.get().getPatternCount();
+	}
+	/**
      * This method samples the sequences based on the tree and site model.
      */
     @Override
@@ -273,7 +283,9 @@ public class MixedTreeLikelihood extends GenericTreeLikelihood {
             int[] states = new int[patternCount];
             int taxonIndex = getTaxonIndex(node.getID(), data);
             for (i = 0; i < patternCount; i++) {
-                int code = data.getPattern(taxonIndex, i);
+            	int code = useSitesNotPatternsInput.get() ?
+                		data.getPattern(taxonIndex, data.getPatternIndex(i))
+                		: data.getPattern(taxonIndex, i);
                 int[] statesForCode = data.getDataType().getStatesForCode(code);
                 if (statesForCode.length==1)
                     states[i] = statesForCode[0];
@@ -318,15 +330,19 @@ public class MixedTreeLikelihood extends GenericTreeLikelihood {
             double[] partials = new double[patternCount * states];
             int k = 0;
             int taxonIndex = getTaxonIndex(node.getID(), data);
-            for (int patternIndex_ = 0; patternIndex_ < patternCount; patternIndex_++) {                
-                double[] tipLikelihoods = data.getTipLikelihoods(taxonIndex,patternIndex_);
+            for (int i = 0; i < patternCount; i++) {
+                double[] tipLikelihoods = useSitesNotPatternsInput.get() ?
+                		data.getTipLikelihoods(taxonIndex, data.getPatternIndex(i))
+                		: data.getTipLikelihoods(taxonIndex, i);
                 if (tipLikelihoods != null) {
                 	for (int state = 0; state < states; state++) {
                 		partials[k++] = tipLikelihoods[state];
                 	}
                 }
                 else {
-                	int stateCount = data.getPattern(taxonIndex, patternIndex_);
+                	int stateCount = useSitesNotPatternsInput.get() ?
+                    		data.getPattern(taxonIndex, data.getPatternIndex(i))
+                    		: data.getPattern(taxonIndex, i);
 	                boolean[] stateSet = data.getStateSet(stateCount);
 	                for (int state = 0; state < states; state++) {
 	                	 partials[k++] = (stateSet[state] ? 1.0 : 0.0);                
@@ -409,18 +425,85 @@ public class MixedTreeLikelihood extends GenericTreeLikelihood {
         }
         return logP;
     }
+    
+    
+    private List<Integer> m_nIncluded, excludedPatterns;
+    private void setupAscertainmentSites() {
+    	Alignment data = dataInput.get();
+        boolean isAscertained = data.isAscertainedInput.get();
+
+        if (isAscertained) {
+            //From AscertainedAlignment
+            int from = data.excludefromInput.get();
+            int to = data.excludetoInput.get();
+            int every = data.excludeeveryInput.get();
+            excludedPatterns = new ArrayList<>();
+            for (int i = from; i < to; i += every) {
+                excludedPatterns.add(i);
+            }
+            
+    		from = data.m_includefrom.get();
+    		to = data.m_includeto.get();
+    		every = data.m_includeevery.get();
+    		m_nIncluded = new ArrayList<>();
+    		for (int i = from; i < to; i += every) {
+    			m_nIncluded.add(i);
+    		}
+        }
+    } // initAndValidate
+
+    
+    private double getAscertainmentCorrection(double[] patternLogProbs) {
+        double excludeProb = 0, includeProb = 0, returnProb = 1.0;
+
+        for (int i = 0; i < m_nIncluded.size(); i++) {
+        	includeProb += Math.exp(patternLogProbs[m_nIncluded.get(i)]);
+        }
+
+        for (int i : excludedPatterns) {
+            excludeProb += Math.exp(patternLogProbs[i]);
+        }
+
+        if (includeProb == 0.0) {
+            returnProb -= excludeProb;
+        } else if (excludeProb == 0.0) {
+            returnProb = includeProb;
+        } else {
+            returnProb = 1.0 + includeProb - excludeProb;
+        }
+        return Math.log(returnProb);
+    } // getAscertainmentCorrection
 
     protected void calcLogP() {
         logP = 0.0;
-        if (useAscertainedSitePatterns) {
-            final double ascertainmentCorrection = dataInput.get().getAscertainmentCorrection(patternLogLikelihoods);
-            for (int i = 0; i < dataInput.get().getPatternCount(); i++) {
-                logP += (patternLogLikelihoods[i] - ascertainmentCorrection) * dataInput.get().getPatternWeight(i);
-            }
+        if (useSitesNotPatternsInput.get()) {
+	        if (useAscertainedSitePatterns) {
+	            final double ascertainmentCorrection = getAscertainmentCorrection(patternLogLikelihoods);
+	            for (int i = 0; i < dataInput.get().getSiteCount(); i++) {
+	            	int j = dataInput.get().getPatternIndex(i);
+	            	if (dataInput.get().getPatternWeight(j) != 0) {
+	            		logP += (patternLogLikelihoods[i] - ascertainmentCorrection);
+	            	}
+	            }
+	        } else {
+	            for (int i = 0; i < dataInput.get().getSiteCount(); i++) {
+	            	int j = dataInput.get().getPatternIndex(i);
+	            	if (dataInput.get().getPatternWeight(j) != 0) {
+	            		logP += patternLogLikelihoods[i];
+	            	}
+	            }
+	        }        	
         } else {
-            for (int i = 0; i < dataInput.get().getPatternCount(); i++) {
-                logP += patternLogLikelihoods[i] * dataInput.get().getPatternWeight(i);
-            }
+	        if (useAscertainedSitePatterns) {
+	            final double ascertainmentCorrection = dataInput.get().getAscertainmentCorrection(patternLogLikelihoods);
+	            for (int i = 0; i < dataInput.get().getPatternCount(); i++) {
+	                logP += (patternLogLikelihoods[i] - ascertainmentCorrection) * dataInput.get().getPatternWeight(i);
+	            }
+	        } else {
+	            for (int i = 0; i < dataInput.get().getPatternCount(); i++) {
+	                logP += patternLogLikelihoods[i] * dataInput.get().getPatternWeight(i);
+	            }
+	        }
         }
     }
 
@@ -441,8 +524,7 @@ public class MixedTreeLikelihood extends GenericTreeLikelihood {
             final Node parent = node.getParent();
             likelihoodCore.setNodeMatrixForUpdate(nodeIndex);
             for (int i = 0; i < m_siteModel.getCategoryCount(); i++) {
-                final double jointBranchRate = m_siteModel.getRateForCategory(i, node) * branchRate;
-                substitutionModel.getTransitionProbabilities(node, parent.getHeight(), node.getHeight(), jointBranchRate, probabilities);
+                m_siteModel.getTransitionProbabilities(node, parent.getHeight(), node.getHeight(), i, branchRate, probabilities);
                 //System.out.println(node.getNr() + " " + Arrays.toString(m_fProbabilities));
                 likelihoodCore.setNodeMatrix(nodeIndex, i, probabilities);
             }
@@ -471,33 +553,33 @@ public class MixedTreeLikelihood extends GenericTreeLikelihood {
                     likelihoodCore.setNodeStatesForUpdate(nodeIndex);
                 }
 
-                if (m_siteModel.integrateAcrossCategories()) {
+                //if (m_siteModel.integrateAcrossCategories()) {
                     likelihoodCore.calculatePartials(childNum1, childNum2, nodeIndex, matrixIndex);
-                } else {
-                    throw new RuntimeException("Error TreeLikelihood 201: Site categories not supported");
+                //} else {
+                //    throw new RuntimeException("Error TreeLikelihood 201: Site categories not supported");
                     //m_pLikelihoodCore->calculatePartials(childNum1, childNum2, nodeNum, siteCategories);
-                }
+                //}
 
                 if (node.isRoot()) {
                     // No parent this is the root of the beast.tree -
                     // calculate the pattern likelihoods
 
-                    final double[] proportions = m_siteModel.getCategoryProportions(node);
-                    likelihoodCore.integratePartials(node.getNr(), proportions, m_fRootPartials);
+//                    final double[] proportions = m_siteModel.getCategoryProportions(node);
+//                    likelihoodCore.integratePartials(node.getNr(), proportions, m_fRootPartials);
 
-                    if (constantPattern != null) { // && !SiteModel.g_bUseOriginal) {
-                        proportionInvariant = m_siteModel.getProportionInvariant();
-                        // some portion of sites is invariant, so adjust root partials for this
-                        for (final int i : constantPattern) {
-                            m_fRootPartials[i] += proportionInvariant;
-                        }
-                    }
+//                    if (constantPattern != null) { // && !SiteModel.g_bUseOriginal) {
+//                        proportionInvariant = m_siteModel.getProportionInvariant();
+//                        // some portion of sites is invariant, so adjust root partials for this
+//                        for (final int i : constantPattern) {
+//                            m_fRootPartials[i] += proportionInvariant;
+//                        }
+//                    }
 
-                    double[] rootFrequencies = substitutionModel.getFrequencies();
-                    if (rootFrequenciesInput.get() != null) {
-                        rootFrequencies = rootFrequenciesInput.get().getFreqs();
-                    }
-                    likelihoodCore.calculateLogLikelihoods(m_fRootPartials, rootFrequencies, patternLogLikelihoods);
+                    double[][] rootFrequencies = m_siteModel.getFrequencies();
+//                    if (rootFrequenciesInput.get() != null) {
+//                        rootFrequencies = rootFrequenciesInput.get().getFreqs();
+//                    }
+                    likelihoodCore.calculateLogLikelihoods(node.getNr(), rootFrequencies, patternLogLikelihoods, matrixIndex);
                 }
 
             }

@@ -11,6 +11,7 @@ import beast.base.evolution.substitutionmodel.SubstitutionModel;
 import beast.base.evolution.tree.Node;
 import beast.base.inference.CalculationNode;
 import beast.base.inference.parameter.IntegerParameter;
+import beast.base.inference.parameter.RealParameter;
 
 @Description("Mixture site model that allows different substitution models for different sites. "
 		+ "To be used in combination with MixedTreeLikelihood")
@@ -20,18 +21,40 @@ public class MixedSiteModel extends SiteModelInterface.Base {
 			"Its length should be number of sites", Validate.REQUIRED);
 	final public Input<List<SubstitutionModel>> mixtureComponentInput = 
             new Input<>("component", "pool of substitution models along branches in the beast.tree", new ArrayList<>(), Validate.REQUIRED);
+    final public Input<RealParameter> muParameterInput = new Input<>("mutationRate", "mutation rate (defaults to 1.0)");
 
-	IntegerParameter siteModelIndex;
+    protected RealParameter muParameter;
+	private IntegerParameter siteModelIndex;
+	private List<SubstitutionModel> mixtureComponent;
+	private double [][] freqs; 
+	
 	public void getSiteModelIndex(int [] matrixIndex) {
 		int n = siteModelIndex.getDimension();
 		if (n != matrixIndex.length) {
-			throw new IllegalArgumentException("Expected matrixindex of length " + n + " instead of " + matrixIndex.length);
+			throw new IllegalArgumentException("Expected site model index of length " + matrixIndex.length + " instead of " + n);
 		}
 		for (int i = 0; i < n; i++) {
 			matrixIndex[i] = siteModelIndex.getValue(i);
 		}
+		
+		mixtureComponent = mixtureComponentInput.get();
+
+		muParameter = muParameterInput.get();
+		if (muParameter == null) {
+			muParameter = new RealParameter("1.0");
+		}
 	}
-	List<SubstitutionModel> mixtureComponent;
+	
+	public void getTransitionProbabilities(Node node, double startTime, double endTime, int category, double rate,
+			double[] matrix) {
+    	final double jointBranchRate = /* getRateForCategory(category, node) */ rate * muParameter.getValue();
+		mixtureComponent.get(category).getTransitionProbabilities(node, startTime, endTime, jointBranchRate, matrix);
+	}
+
+	
+	public MixedSiteModel() {
+		substModelInput.setRule(Validate.FORBIDDEN);
+	}
 	
 	@Override
 	public void initAndValidate() {
@@ -83,6 +106,16 @@ public class MixedSiteModel extends SiteModelInterface.Base {
 		for (int i = 0; i < mixtureComponent.size(); i++) {
 			dirtySiteModels[i] = ((CalculationNode)mixtureComponent.get(i)).isDirtyCalculation();
 		}
+	}
+
+	public double[][] getFrequencies() {
+		if (freqs == null) {
+			freqs = new double[mixtureComponent.size()][];
+		}
+		for (int i = 0; i < freqs.length; i++) {
+			freqs[i] = mixtureComponent.get(i).getFrequencies();
+		}
+		return freqs;
 	}
 	
 }
