@@ -48,8 +48,14 @@ public class MixedTreeLikelihoodSingleComponentTest  {
         return new MixedTreeLikelihood();
     }
 
+
     @Test
     public void testJC69Likelihood() throws Exception {
+    	testJC69Likelihood(true);
+    	testJC69Likelihood(false);
+    }
+    
+    public void testJC69Likelihood(boolean useSitesNotPatterns) throws Exception {
         // Set up JC69 model: uniform freqs, kappa = 1, 0 gamma categories
         Alignment data = BEASTTestCase.getAlignment();
         Tree tree = BEASTTestCase.getTree(data);
@@ -59,22 +65,27 @@ public class MixedTreeLikelihoodSingleComponentTest  {
 
         MixedSiteModel mixedSiteModel = new MixedSiteModel();
         IntegerParameter siteModelIndex = new IntegerParameter();
-        siteModelIndex.initByName("value", "0", "dimension", 768);
+        siteModelIndex.initByName("value", "0", "dimension", useSitesNotPatterns ? data.getSiteCount() : data.getPatternCount());
         mixedSiteModel.initByName("component", JC, "siteModelIndex", siteModelIndex);
 
         GenericTreeLikelihood likelihood = newTreeLikelihood();
-        likelihood.initByName("data", data, "tree", tree, "siteModel", mixedSiteModel);
+        likelihood.initByName("data", data, "tree", tree, "siteModel", mixedSiteModel, "useSitesNotPatterns", useSitesNotPatterns);
         double logP = 0;
         logP = likelihood.calculateLogP();
         assertEquals(logP, -1992.2056440317247, BEASTTestCase.PRECISION);
 
-        likelihood.initByName("useAmbiguities", true, "data", data, "tree", tree, "siteModel", mixedSiteModel);
+        likelihood.initByName("useAmbiguities", true, "data", data, "tree", tree, "siteModel", mixedSiteModel, "useSitesNotPatterns", useSitesNotPatterns);
         logP = likelihood.calculateLogP();
         assertEquals(logP, -1992.2056440317247, BEASTTestCase.PRECISION);
     }
 
     @Test
     public void testJC69LikelihoodWithUncertainCharacters() throws Exception {
+    	testJC69LikelihoodWithUncertainCharacters(true);
+    	testJC69LikelihoodWithUncertainCharacters(false);
+    }
+    
+    public void testJC69LikelihoodWithUncertainCharacters(boolean useSitesNotPatterns) throws Exception {
     	    	    	
     	Alignment data = UncertainAlignmentTest.getAlignment();
     	Alignment data2 = UncertainAlignmentTest.getUncertainAlignment();
@@ -82,8 +93,8 @@ public class MixedTreeLikelihoodSingleComponentTest  {
     	
     	System.out.println("\nTree A:");
     	Tree tree = UncertainAlignmentTest.getTreeA(data2);    	    	
-    	logL = testJC69Likelihood(data,tree);
-    	logL_uncertain = testJC69Likelihood(data2,tree);
+    	logL = testJC69Likelihood(data,tree, useSitesNotPatterns);
+    	logL_uncertain = testJC69Likelihood(data2,tree, useSitesNotPatterns);
     	double x1 = -11.853202336328778;
     	double x2 = -12.069603116476458;
     	assertEquals(logL[0], x1, BEASTTestCase.PRECISION);    	
@@ -93,8 +104,8 @@ public class MixedTreeLikelihoodSingleComponentTest  {
     	
     	System.out.println("\nTree B:");
     	tree = UncertainAlignmentTest.getTreeB(data2);
-    	logL = testJC69Likelihood(data,tree);
-    	logL_uncertain = testJC69Likelihood(data2,tree);
+    	logL = testJC69Likelihood(data,tree, useSitesNotPatterns);
+    	logL_uncertain = testJC69Likelihood(data2,tree, useSitesNotPatterns);
     	double x3 = -12.421114302827698;
     	double x4 = -11.62105662310513;
     	assertEquals(logL[0], x3, BEASTTestCase.PRECISION);    	
@@ -104,20 +115,20 @@ public class MixedTreeLikelihoodSingleComponentTest  {
     	
     	System.out.println("\nTesting alignment doubling:");
     	Alignment data3 = UncertainAlignmentTest.getUncertainAlignmentDoubled();    	    	
-    	logL_uncertain = testJC69Likelihood(data3,tree);
+    	logL_uncertain = testJC69Likelihood(data3,tree, useSitesNotPatterns);
     	assertEquals(logL_uncertain[0], 2 * x3, BEASTTestCase.PRECISION);    	
     	assertEquals(logL_uncertain[1], 2 * x4, BEASTTestCase.PRECISION);    	    
     	
     }        
     
-    public double[] testJC69Likelihood(Alignment data, Tree tree) throws Exception {
+    public double[] testJC69Likelihood(Alignment data, Tree tree, boolean useSitesNotPatterns) throws Exception {
         // Set up JC69 model: uniform freqs, kappa = 1, 0 gamma categories                              
         JukesCantor JC = new JukesCantor();
         JC.initAndValidate();
 
         MixedSiteModel mixedSiteModel = new MixedSiteModel();
         IntegerParameter siteModelIndex = new IntegerParameter();
-        siteModelIndex.initByName("value", "0", "dimension", data.getSiteCount());
+        siteModelIndex.initByName("value", "0", "dimension", useSitesNotPatterns ? data.getSiteCount() : data.getPatternCount());
         mixedSiteModel.initByName("component", JC, "siteModelIndex", siteModelIndex);
 
         // NB The rate in the JC model used here is actually alpha * 3 in the usual sense, because
@@ -128,13 +139,14 @@ public class MixedTreeLikelihoodSingleComponentTest  {
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", "0.6"); 
         likelihood.initByName("data", data, "tree", tree, "siteModel", mixedSiteModel, "scaling", MixedTreeLikelihood.Scaling.none, 
-        		"branchRateModel", clockModel);        
+        		"branchRateModel", clockModel, "useSitesNotPatterns", useSitesNotPatterns);        
         double[] logP = new double[2];
         logP[0] = likelihood.calculateLogP();
         System.out.println(logP[0]);
 
         System.out.println("With tip likelihoods:");
-        likelihood.initByName("useTipLikelihoods", true, "data", data, "tree", tree, "siteModel", mixedSiteModel, "scaling", MixedTreeLikelihood.Scaling.none);
+        likelihood.initByName("useTipLikelihoods", true, "data", data, "tree", tree, "siteModel", mixedSiteModel, "scaling", MixedTreeLikelihood.Scaling.none
+        		,"useSitesNotPatterns", useSitesNotPatterns);
         logP[1]= likelihood.calculateLogP();
         System.out.println(logP[1]);
 
@@ -143,6 +155,11 @@ public class MixedTreeLikelihoodSingleComponentTest  {
     
     @Test
     public void testAscertainedJC69Likelihood() throws Exception {
+    	testAscertainedJC69Likelihood(true);
+    	testAscertainedJC69Likelihood(false);
+    }
+    
+    public void testAscertainedJC69Likelihood(boolean useSitesNotPatterns) throws Exception {
         // as testJC69Likelihood but with ascertained alignment
         Alignment data = BEASTTestCase.getAscertainedAlignment();
         Tree tree = BEASTTestCase.getTree(data);
@@ -156,11 +173,11 @@ public class MixedTreeLikelihoodSingleComponentTest  {
 
         MixedSiteModel mixedSiteModel = new MixedSiteModel();
         IntegerParameter siteModelIndex = new IntegerParameter();
-        siteModelIndex.initByName("value", "0", "dimension", data.getSiteCount());
+        siteModelIndex.initByName("value", "0", "dimension", useSitesNotPatterns ? data.getSiteCount() : data.getPatternCount());
         mixedSiteModel.initByName("component", hky, "siteModelIndex", siteModelIndex);
 
         GenericTreeLikelihood likelihood = newTreeLikelihood();
-        likelihood.initByName("data", data, "tree", tree, "siteModel", mixedSiteModel);
+        likelihood.initByName("data", data, "tree", tree, "siteModel", mixedSiteModel, "useSitesNotPatterns", useSitesNotPatterns);
 
         double logP = 0;
         logP = likelihood.calculateLogP();
@@ -170,6 +187,11 @@ public class MixedTreeLikelihoodSingleComponentTest  {
 
     @Test
     public void testK80Likelihood() throws Exception {
+    	testK80Likelihood(true);
+    	testK80Likelihood(false);
+    }
+    
+    public void testK80Likelihood(boolean useSitesNotPatterns) throws Exception {
         // Set up K80 model: uniform freqs, kappa = 27.402591, 0 gamma categories
         Alignment data = BEASTTestCase.getAlignment();
         Tree tree = BEASTTestCase.getTree(data);
@@ -183,11 +205,11 @@ public class MixedTreeLikelihoodSingleComponentTest  {
 
         MixedSiteModel mixedSiteModel = new MixedSiteModel();
         IntegerParameter siteModelIndex = new IntegerParameter();
-        siteModelIndex.initByName("value", "0", "dimension", data.getSiteCount());
+        siteModelIndex.initByName("value", "0", "dimension", useSitesNotPatterns ? data.getSiteCount() : data.getPatternCount());
         mixedSiteModel.initByName("component", hky, "siteModelIndex", siteModelIndex);
 
         MixedTreeLikelihood likelihood = newTreeLikelihood();
-        likelihood.initByName("data", data, "tree", tree, "siteModel", mixedSiteModel);
+        likelihood.initByName("data", data, "tree", tree, "siteModel", mixedSiteModel, "useSitesNotPatterns", useSitesNotPatterns);
 
         double logP = 0;
         logP = likelihood.calculateLogP();
@@ -200,6 +222,11 @@ public class MixedTreeLikelihoodSingleComponentTest  {
 
     @Test
     public void testHKY85Likelihood() throws Exception {
+    	testHKY85Likelihood(true);
+    	testHKY85Likelihood(false);
+    }
+    
+    public void testHKY85Likelihood(boolean useSitesNotPatterns) throws Exception {
         // Set up HKY85 model: estimated freqs, kappa = 29.739445, 0 gamma categories
         Alignment data = BEASTTestCase.getAlignment();
         Tree tree = BEASTTestCase.getTree(data);
@@ -212,11 +239,11 @@ public class MixedTreeLikelihoodSingleComponentTest  {
 
         MixedSiteModel mixedSiteModel = new MixedSiteModel();
         IntegerParameter siteModelIndex = new IntegerParameter();
-        siteModelIndex.initByName("value", "0", "dimension", data.getSiteCount());
+        siteModelIndex.initByName("value", "0", "dimension", useSitesNotPatterns ? data.getSiteCount() : data.getPatternCount());
         mixedSiteModel.initByName("component", hky, "siteModelIndex", siteModelIndex);
 
         MixedTreeLikelihood likelihood = newTreeLikelihood();
-        likelihood.initByName("data", data, "tree", tree, "siteModel", mixedSiteModel);
+        likelihood.initByName("data", data, "tree", tree, "siteModel", mixedSiteModel, "useSitesNotPatterns", useSitesNotPatterns);
 
         double logP = 0;
         logP = likelihood.calculateLogP();
@@ -230,6 +257,10 @@ public class MixedTreeLikelihoodSingleComponentTest  {
 
     @Test
     public void testGTRLikelihood() throws Exception {
+    	testGTRLikelihood(true);
+    	testGTRLikelihood(false);
+    }
+    public void testGTRLikelihood(boolean useSitesNotPatterns) throws Exception {
         // Set up GTR model: no gamma categories, no proportion invariant
         Alignment data = BEASTTestCase.getAlignment();
         Tree tree = BEASTTestCase.getTree(data);
@@ -242,11 +273,11 @@ public class MixedTreeLikelihoodSingleComponentTest  {
 
         MixedSiteModel mixedSiteModel = new MixedSiteModel();
         IntegerParameter siteModelIndex = new IntegerParameter();
-        siteModelIndex.initByName("value", "0", "dimension", data.getSiteCount());
+        siteModelIndex.initByName("value", "0", "dimension", useSitesNotPatterns ? data.getSiteCount() : data.getPatternCount());
         mixedSiteModel.initByName("component", gtr, "siteModelIndex", siteModelIndex);
 
         MixedTreeLikelihood likelihood = newTreeLikelihood();
-        likelihood.initByName("data", data, "tree", tree, "siteModel", mixedSiteModel);
+        likelihood.initByName("data", data, "tree", tree, "siteModel", mixedSiteModel, "useSitesNotPatterns", useSitesNotPatterns);
 
         double logP = 0;
         logP = likelihood.calculateLogP();
@@ -257,16 +288,16 @@ public class MixedTreeLikelihoodSingleComponentTest  {
         assertEquals(logP, -1969.145839307625, BEASTTestCase.PRECISION);
     }
 
-    void aminoacidModelTest(SubstitutionModel substModel, double expectedValue) throws Exception {
+    void aminoacidModelTest(SubstitutionModel substModel, boolean useSitesNotPatterns, double expectedValue) throws Exception {
         Alignment data = BEASTTestCase.getAminoAcidAlignment();
         Tree tree = BEASTTestCase.getAminoAcidTree(data);
         MixedSiteModel mixedSiteModel = new MixedSiteModel();
         IntegerParameter siteModelIndex = new IntegerParameter();
-        siteModelIndex.initByName("value", "0", "dimension", data.getSiteCount());
+        siteModelIndex.initByName("value", "0", "dimension", useSitesNotPatterns ? data.getSiteCount() : data.getPatternCount());
         mixedSiteModel.initByName("component", substModel, "siteModelIndex", siteModelIndex);
 
         MixedTreeLikelihood likelihood = newTreeLikelihood();
-        likelihood.initByName("data", data, "tree", tree, "siteModel", mixedSiteModel);
+        likelihood.initByName("data", data, "tree", tree, "siteModel", mixedSiteModel, "useSitesNotPatterns", useSitesNotPatterns);
         double logP = 0;
         logP = likelihood.calculateLogP();
         assertEquals(expectedValue, logP, BEASTTestCase.PRECISION);
@@ -277,8 +308,8 @@ public class MixedTreeLikelihoodSingleComponentTest  {
         // Set up WAG model
         WAG wag = new WAG();
         wag.initAndValidate();
-        aminoacidModelTest(wag, -338.6388785157248);
-
+        aminoacidModelTest(wag, true, -338.6388785157248);
+        aminoacidModelTest(wag, false, -338.6388785157248);
     }
 
     @Test
@@ -286,7 +317,8 @@ public class MixedTreeLikelihoodSingleComponentTest  {
         // JTT
         JTT jtt = new JTT();
         jtt.initAndValidate();
-        aminoacidModelTest(jtt, -338.80761792179726);
+        aminoacidModelTest(jtt, true, -338.80761792179726);
+        aminoacidModelTest(jtt, false, -338.80761792179726);
 
     }
 
@@ -295,7 +327,8 @@ public class MixedTreeLikelihoodSingleComponentTest  {
         // Blosum62
         Blosum62 blosum62 = new Blosum62();
         blosum62.initAndValidate();
-        aminoacidModelTest(blosum62, -345.3825963600176);
+        aminoacidModelTest(blosum62, true, -345.3825963600176);
+        aminoacidModelTest(blosum62, false, -345.3825963600176);
 
     }
 
@@ -304,7 +337,8 @@ public class MixedTreeLikelihoodSingleComponentTest  {
         // Dayhoff
         Dayhoff dayhoff = new Dayhoff();
         dayhoff.initAndValidate();
-        aminoacidModelTest(dayhoff, -340.6149187667345);
+        aminoacidModelTest(dayhoff, true, -340.6149187667345);
+        aminoacidModelTest(dayhoff, false, -340.6149187667345);
     }
 
     @Test
@@ -312,7 +346,8 @@ public class MixedTreeLikelihoodSingleComponentTest  {
         // cpRev
         CPREV cpRev = new CPREV();
         cpRev.initAndValidate();
-        aminoacidModelTest(cpRev, -348.71458467304154);
+        aminoacidModelTest(cpRev, true, -348.71458467304154);
+        aminoacidModelTest(cpRev, false, -348.71458467304154);
     }
 
     @Test
@@ -320,13 +355,19 @@ public class MixedTreeLikelihoodSingleComponentTest  {
         // MTRev
         MTREV mtRev = new MTREV();
         mtRev.initAndValidate();
-        aminoacidModelTest(mtRev, -369.4791633617842);
+        aminoacidModelTest(mtRev, true, -369.4791633617842);
+        aminoacidModelTest(mtRev, false, -369.4791633617842);
 
     }
 
 
     @Test
     public void testSDolloLikelihood() throws Exception {
+    	testSDolloLikelihood(true);
+    	testSDolloLikelihood(false);
+    }
+    
+    public void testSDolloLikelihood(boolean useSitesNotPatterns) throws Exception {
         UserDataType dataType = new UserDataType();
         dataType.initByName("states", 2, "codeMap", "0=1, 1=0, ?=0 1, -=0 1");
         Alignment data = new Alignment();
@@ -360,11 +401,11 @@ public class MixedTreeLikelihoodSingleComponentTest  {
 
         MixedSiteModel mixedSiteModel = new MixedSiteModel();
         IntegerParameter siteModelIndex = new IntegerParameter();
-        siteModelIndex.initByName("value", "0", "dimension", data.getSiteCount());
+        siteModelIndex.initByName("value", "0", "dimension", useSitesNotPatterns ? data.getSiteCount() : data.getPatternCount());
         mixedSiteModel.initByName("component", SDollo, "siteModelIndex", siteModelIndex);
 
         MixedTreeLikelihood likelihood = newTreeLikelihood();
-        likelihood.initByName("data", data, "tree", tree, "siteModel", mixedSiteModel);
+        likelihood.initByName("data", data, "tree", tree, "siteModel", mixedSiteModel, "useSitesNotPatterns", useSitesNotPatterns);
 
         double logP = 0;
         likelihood.initByName("data", data, "tree", tree, "siteModel", mixedSiteModel, "useAmbiguities", true);
@@ -376,6 +417,11 @@ public class MixedTreeLikelihoodSingleComponentTest  {
 
     @Test
     public void testBinaryCovarionLikelihood() throws Exception {
+    	testBinaryCovarionLikelihood(true);
+    	testBinaryCovarionLikelihood(false);
+    }
+    
+    public void testBinaryCovarionLikelihood(boolean useSitesNotPatterns) throws Exception {
         Alignment data = BEASTTestCase.getCovarionAlignment();
         Tree tree = BEASTTestCase.getTree(data, "((English_ST:0.22743347188019544,(German_ST:0.10557648379843088,Dutch_List:0.10557648379843088):0.12185698808176457):1.5793160946109988,(Spanish:0.11078392189606047,(Italian:0.10119772534558173,French:0.10119772534558173):0.009586196550478737):1.6959656445951337)");
 
@@ -389,11 +435,11 @@ public class MixedTreeLikelihoodSingleComponentTest  {
 
         MixedSiteModel mixedSiteModel = new MixedSiteModel();
         IntegerParameter siteModelIndex = new IntegerParameter();
-        siteModelIndex.initByName("value", "0", "dimension", data.getSiteCount());
+        siteModelIndex.initByName("value", "0", "dimension", useSitesNotPatterns ? data.getSiteCount() : data.getPatternCount());
         mixedSiteModel.initByName("component", covarion, "siteModelIndex", siteModelIndex);
 
         MixedTreeLikelihood likelihood = newTreeLikelihood();
-        likelihood.initByName("data", data, "tree", tree, "siteModel", mixedSiteModel, "useSitesNotPatterns", true);
+        likelihood.initByName("data", data, "tree", tree, "siteModel", mixedSiteModel, "useSitesNotPatterns", true, "useSitesNotPatterns", useSitesNotPatterns);
 
         double logP = 0;
         likelihood.initByName("useAmbiguities", true, "data", data, "tree", tree, "siteModel", mixedSiteModel);
@@ -404,6 +450,11 @@ public class MixedTreeLikelihoodSingleComponentTest  {
 
     @Test
     public void testMarginalisationOfLikelihoodBinary() throws Exception {
+    	testMarginalisationOfLikelihoodBinary(true);
+    	testMarginalisationOfLikelihoodBinary(false);
+    }
+    
+    public void testMarginalisationOfLikelihoodBinary(boolean useSitesNotPatterns) throws Exception {
     	// test summation over all patterns adds to 1 for binary data
 
     	Sequence German_ST =  new Sequence("German_ST", "           10110010");
@@ -426,11 +477,11 @@ public class MixedTreeLikelihoodSingleComponentTest  {
 
         MixedSiteModel mixedSiteModel = new MixedSiteModel();
         IntegerParameter siteModelIndex = new IntegerParameter();
-        siteModelIndex.initByName("value", "0", "dimension", data.getSiteCount());
+        siteModelIndex.initByName("value", "0", "dimension", useSitesNotPatterns ? data.getSiteCount() : data.getPatternCount());
         mixedSiteModel.initByName("component", covarion, "siteModelIndex", siteModelIndex);
 
         MixedTreeLikelihood likelihood = newTreeLikelihood();
-        likelihood.initByName("data", data, "tree", tree, "siteModel", mixedSiteModel);
+        likelihood.initByName("data", data, "tree", tree, "siteModel", mixedSiteModel, "useSitesNotPatterns", useSitesNotPatterns);
         
         likelihood.initByName("useAmbiguities", false, "data", data, "tree", tree, "siteModel", mixedSiteModel);
         likelihood.calculateLogP();
@@ -444,6 +495,11 @@ public class MixedTreeLikelihoodSingleComponentTest  {
 
     @Test
     public void testMarginalisationOfLikelihoodNucleotide() throws Exception {
+    	testMarginalisationOfLikelihoodNucleotide(true);
+    	testMarginalisationOfLikelihoodNucleotide(false);
+    }
+    
+    public void testMarginalisationOfLikelihoodNucleotide(boolean useSitesNotPatterns) throws Exception {
     	// test summation over all patterns adds to 1 for nucleotide data
 
     	Sequence German_ST =  new Sequence("German_ST", "           AAAAAAAAAAAAAAAA CCCCCCCCCCCCCCCC GGGGGGGGGGGGGGGG TTTTTTTTTTTTTTTT");
@@ -466,11 +522,11 @@ public class MixedTreeLikelihoodSingleComponentTest  {
 
         MixedSiteModel mixedSiteModel = new MixedSiteModel();
         IntegerParameter siteModelIndex = new IntegerParameter();
-        siteModelIndex.initByName("value", "0", "dimension", data.getSiteCount());
+        siteModelIndex.initByName("value", "0", "dimension", useSitesNotPatterns ? data.getSiteCount() : data.getPatternCount());
         mixedSiteModel.initByName("component", gsm, "siteModelIndex", siteModelIndex);
 
         MixedTreeLikelihood likelihood = newTreeLikelihood();
-        likelihood.initByName("data", data, "tree", tree, "siteModel", mixedSiteModel);
+        likelihood.initByName("data", data, "tree", tree, "siteModel", mixedSiteModel, "useSitesNotPatterns", useSitesNotPatterns);
 
         likelihood.initByName("useAmbiguities", false, "data", data, "tree", tree, "siteModel", mixedSiteModel);
         likelihood.calculateLogP();
