@@ -28,7 +28,7 @@ public class C10MixedSiteModel extends MixedSiteModel {
 
 	public C10MixedSiteModel() {
 		mixtureComponentInput.setRule(Validate.FORBIDDEN);
-		substModelInput.setRule(Validate.FORBIDDEN);
+		substModelInput.setRule(Validate.OPTIONAL);
 	}
 
 	@Override

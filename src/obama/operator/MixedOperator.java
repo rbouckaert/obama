@@ -5,6 +5,7 @@ import java.util.List;
 import beast.base.core.Description;
 import beast.base.core.Input;
 import beast.base.core.Input.Validate;
+import beast.base.evolution.alignment.Alignment;
 import beast.base.evolution.likelihood.BeagleTreeLikelihood;
 import beast.base.evolution.likelihood.TreeLikelihood;
 import beast.base.evolution.sitemodel.SiteModel;
@@ -20,6 +21,7 @@ import obama.sitemodel.MixedSiteModel;
 public class MixedOperator extends Operator {
 	final public Input<IntegerParameter> indexInput = new Input<>("index", "index that identifies for each site (or pattern) the component that is used as substitution model", Validate.REQUIRED);
 	final public Input<MixedTreeLikelihood> likelihoodInput = new Input<>("likelihood", "mixed tree likelihood used for calculating site likelihoods for each site (or pattern)");
+	final public Input<MixedSiteModel> siteModelInput = new Input<>("siteModel", "site model containing mixture components to choose from");
 
 	private IntegerParameter index;
 	private MyTreeLikelihood treelikelihood;
@@ -27,10 +29,13 @@ public class MixedOperator extends Operator {
 	private List<SubstitutionModel> components;
 	private double [][] siteLogProbs;
 	private double [] probs;
+	private boolean useSitesNotPatterns;
+	private int siteCount;
+	private Alignment data;
 	
 	@Override
 	public void initAndValidate() {
-		components = ((MixedSiteModel)likelihoodInput.get().siteModelInput.get()).getMixtureComponents();
+		components = siteModelInput.get().getMixtureComponents();
 		initTreeLikelihood();
 		index = indexInput.get();
 		
@@ -41,6 +46,10 @@ public class MixedOperator extends Operator {
 		
 		siteLogProbs = new double [componentCount][patternCount];
 		probs = new double[componentCount];
+		
+		useSitesNotPatterns = likelihoodInput.get().useSitesNotPatternsInput.get();
+		data = likelihoodInput.get().dataInput.get();
+		siteCount = data.getSiteCount();
 	}
 
 	
@@ -62,7 +71,7 @@ public class MixedOperator extends Operator {
 		MixedTreeLikelihood mtl = likelihoodInput.get();
 		SubstitutionModel dummySubstModel = components.get(0);
 		SiteModel siteModel = new SiteModel();
-		siteModel.initByName("substModel", dummySubstModel, "categoryCount", 1);
+		siteModel.initByName("substModel", dummySubstModel, "gammaCategoryCount", 1);
 		
 		
 		MyBeagleTreeLikelihood beagleTreeLikelihood = new MyBeagleTreeLikelihood();
@@ -96,7 +105,7 @@ public class MixedOperator extends Operator {
 			calcLikelihoodForComponent(i);
 		}
 		
-		for (int i = 0; i < siteLogProbs.length; i++) {
+		for (int i = 0; i < siteLogProbs[0].length; i++) {
 			int s = sampleIndex(i);
 			index.setValue(i, s);
 		}		
@@ -124,9 +133,12 @@ public class MixedOperator extends Operator {
 		}
 		double r = Randomizer.nextDouble();
 		int i = 0;
-		while (r > probs[i]) {
+		while (i < probs.length && r > probs[i]) {
 			r -= probs[i];
 			i++;
+		}
+		if (i == probs.length) {
+			i--;
 		}
 		return i;
 	}
@@ -137,16 +149,33 @@ public class MixedOperator extends Operator {
 			
 			beagleTreeLikelihood.calculateLogP();
 			
-			System.arraycopy(beagleTreeLikelihood.getPatternLogLikelihoods(), 0,
-					siteLogProbs[i], 0, siteLogProbs[i].length);
-			
+			double [] patternLogLikelihoods = beagleTreeLikelihood.getPatternLogLikelihoods();
+			if (useSitesNotPatterns) {
+				double [] target = siteLogProbs[i];
+				for (int j = 0; j < siteCount; j++) {
+					int k = data.getPatternIndex(j);
+					target[j] = patternLogLikelihoods[k];
+				}
+			} else {
+				System.arraycopy(patternLogLikelihoods, 0,
+					siteLogProbs[i], 0, patternLogLikelihoods.length);
+			}
 		} else {
 			treelikelihood.setSubstModel(components.get(i));
 			
 			treelikelihood.calculateLogP();
 			
-			System.arraycopy(treelikelihood.getPatternLogLikelihoods(), 0,
-					siteLogProbs[i], 0, siteLogProbs[i].length);
+			double [] patternLogLikelihoods = treelikelihood.getPatternLogLikelihoods();
+			if (useSitesNotPatterns) {
+				double [] target = siteLogProbs[i];
+				for (int j = 0; j < siteCount; j++) {
+					int k = data.getPatternIndex(j);
+					target[j] = patternLogLikelihoods[k];
+				}
+			} else {
+				System.arraycopy(patternLogLikelihoods, 0,
+					siteLogProbs[i], 0, patternLogLikelihoods.length);
+			}
 		}
 	}
 

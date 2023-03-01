@@ -47,6 +47,16 @@
         <provider classname="obama.sitemodel.C40SiteModel"/>
         <provider classname="obama.sitemodel.C50SiteModel"/>
         <provider classname="obama.sitemodel.C60SiteModel"/>
+        
+        <provider classname="obama.likelihood.MixedTreeLikelihood"/>
+        <provider classname="obama.operator.MixedOperator"/>
+        <provider classname="obama.sitemodel.MixedSiteModel"/>
+        <provider classname="obama.sitemodel.C10MixedSiteModel"/>
+        <provider classname="obama.sitemodel.C20MixedSiteModel"/>
+        <provider classname="obama.sitemodel.C30MixedSiteModel"/>
+        <provider classname="obama.sitemodel.C40MixedSiteModel"/>
+        <provider classname="obama.sitemodel.C50MixedSiteModel"/>
+        <provider classname="obama.sitemodel.C60MixedSiteModel"/>
     </service>
 
     <service type="beastfx.app.inputeditor.InputEditor">

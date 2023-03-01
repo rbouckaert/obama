@@ -41,7 +41,7 @@ public class MixedSiteModel extends SiteModelInterface.Base {
 			matrixIndex[i] = siteModelIndex.getValue(i);
 		}
 		
-		initialiseMixtureComponents();
+		// mixtureComponent = initialiseMixtureComponents();
 
 		muParameter = muParameterInput.get();
 		if (muParameter == null) {
@@ -66,7 +66,7 @@ public class MixedSiteModel extends SiteModelInterface.Base {
 	@Override
 	public void initAndValidate() {
 		siteModelIndex = siteModelIndexInput.get();
-		mixtureComponent = mixtureComponentInput.get();
+		mixtureComponent = initialiseMixtureComponents();
 	}
 
 	@Override
