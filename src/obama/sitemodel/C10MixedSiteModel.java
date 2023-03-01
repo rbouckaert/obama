@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import beast.base.core.Input.Validate;
+import beast.base.core.Log;
 import beast.base.evolution.datatype.Aminoacid;
 import beast.base.evolution.substitutionmodel.EmpiricalSubstitutionModel;
 import beast.base.evolution.substitutionmodel.Frequencies;
@@ -37,10 +38,12 @@ public class C10MixedSiteModel extends MixedSiteModel {
 		Double [] rates = new Double[20*19];
     	if (substModelInput.get() == null) {
     		// assume equal rates
+    		Log.warning("Using equal rates for rate matrix");
     		for (int i = 0; i < rates.length; i++) {
     			rates[i] = 1.0;
     		}
     	} else {
+    		Log.warning("Using " + substModelInput.get().getClass().getName() + " as rate matrix");
     		double [] r = substModelInput.get().getRateMatrix(null);
     		int [] order = ((EmpiricalSubstitutionModel)substModelInput.get()).getEncodingOrder();
     		int k = 0;

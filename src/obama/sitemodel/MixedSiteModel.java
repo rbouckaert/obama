@@ -1,6 +1,7 @@
 package obama.sitemodel;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import beast.base.core.Description;
@@ -32,6 +33,21 @@ public class MixedSiteModel extends SiteModelInterface.Base {
 		substModelInput.setRule(Validate.FORBIDDEN);
 	}
 	
+	@Override
+	public void initAndValidate() {
+		siteModelIndex = siteModelIndexInput.get();
+		
+		mixtureComponent = initialiseMixtureComponents();
+	
+		muParameter = muParameterInput.get();
+		if (muParameter == null) {
+			muParameter = new RealParameter("1.0");
+		} 
+		if (muParameter.getDimension() != mixtureComponent.size()) {
+			muParameter.setDimension(mixtureComponent.size());			
+		}
+	}
+
 	public void getSiteModelIndex(int [] matrixIndex) {
 		int n = siteModelIndex.getDimension();
 		if (n != matrixIndex.length) {
@@ -39,13 +55,6 @@ public class MixedSiteModel extends SiteModelInterface.Base {
 		}
 		for (int i = 0; i < n; i++) {
 			matrixIndex[i] = siteModelIndex.getValue(i);
-		}
-		
-		// mixtureComponent = initialiseMixtureComponents();
-
-		muParameter = muParameterInput.get();
-		if (muParameter == null) {
-			muParameter = new RealParameter("1.0");
 		}
 	}
 	
@@ -55,7 +64,7 @@ public class MixedSiteModel extends SiteModelInterface.Base {
 
 	public void getTransitionProbabilities(Node node, double startTime, double endTime, int category, double rate,
 			double[] matrix) {
-    	final double jointBranchRate = /* getRateForCategory(category, node) */ rate * muParameter.getValue();
+    	final double jointBranchRate = /* getRateForCategory(category, node) */ rate * muParameter.getValue(category);
 		mixtureComponent.get(category).getTransitionProbabilities(node, startTime, endTime, jointBranchRate, matrix);
 	}
 
@@ -63,11 +72,6 @@ public class MixedSiteModel extends SiteModelInterface.Base {
 		return mixtureComponent;
 	}
 	
-	@Override
-	public void initAndValidate() {
-		siteModelIndex = siteModelIndexInput.get();
-		mixtureComponent = initialiseMixtureComponents();
-	}
 
 	@Override
 	public boolean integrateAcrossCategories() {
@@ -110,8 +114,16 @@ public class MixedSiteModel extends SiteModelInterface.Base {
 	}
 
 	public void getDirtySiteModels(boolean[] dirtySiteModels) {
+		// if the site model index was updated, we need to recalculate everything 
+		if (siteModelIndex.isDirtyCalculation()) {
+			Arrays.fill(dirtySiteModels, true);
+			return;
+		}
+		
 		for (int i = 0; i < mixtureComponent.size(); i++) {
-			dirtySiteModels[i] = ((CalculationNode)mixtureComponent.get(i)).isDirtyCalculation();
+			dirtySiteModels[i] = 
+					((CalculationNode)mixtureComponent.get(i)).isDirtyCalculation()
+					|| muParameter.isDirty(i);
 		}
 	}
 

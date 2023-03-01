@@ -390,10 +390,12 @@ public class MixedTreeLikelihood extends GenericTreeLikelihood {
         try {
         	m_siteModel.getSiteModelIndex(matrixIndex);
         	m_siteModel.getDirtySiteModels(dirtySiteModels);
-        	boolean [] mask = likelihoodCore.mask;
+        	boolean [] unmask = likelihoodCore.unmask;
         	for (int i = 0; i < matrixIndex.length; i++) {
-        		mask[i] = dirtySiteModels[matrixIndex[i]];
+        		unmask[i] = dirtySiteModels[matrixIndex[i]];
         	}
+        	// TODO: remove next line and make recalculation more efficient
+        	Arrays.fill(unmask, true);
         	
         	
         	if (traverse(tree.getRoot()) != Tree.IS_CLEAN)
@@ -520,6 +522,9 @@ public class MixedTreeLikelihood extends GenericTreeLikelihood {
         // First update the transition probability matrix(ices) for this branch
         //if (!node.isRoot() && (update != Tree.IS_CLEAN || branchTime != m_StoredBranchLengths[nodeIndex])) {
         if (!node.isRoot() && (update != Tree.IS_CLEAN || branchTime != m_branchLengths[nodeIndex])) {
+            if (branchTime != m_branchLengths[nodeIndex]) {
+            	Arrays.fill(likelihoodCore.unmask, true);
+            }
             m_branchLengths[nodeIndex] = branchTime;
             final Node parent = node.getParent();
             likelihoodCore.setNodeMatrixForUpdate(nodeIndex);

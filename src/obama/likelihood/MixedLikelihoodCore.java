@@ -24,7 +24,7 @@ public class MixedLikelihoodCore {
     protected int[] currentPartialsIndex;
     protected int[] storedPartialsIndex;
 
-    protected boolean[] mask;
+    protected boolean[] unmask;
 
     
     protected boolean useScaling = false;
@@ -49,7 +49,7 @@ public class MixedLikelihoodCore {
         int v = 0;
 
         for (int k = 0; k < nrOfPatterns; k++) {
-        	if (!mask[k]) {
+        	if (unmask[k]) {
 	
 	            int state1 = stateIndex1[k];
 	            int state2 = stateIndex2[k];
@@ -111,7 +111,7 @@ public class MixedLikelihoodCore {
         int v = 0;
 
         for (int k = 0; k < nrOfPatterns; k++) {
-        	if (!mask[k]) {
+        	if (unmask[k]) {
 	            int state1 = stateIndex1[k];
 	
 	            int w = matrixMap[k] * matrixSize;
@@ -166,7 +166,7 @@ public class MixedLikelihoodCore {
         int v = 0;
 
         for (int k = 0; k < nrOfPatterns; k++) {
-        	if (!mask[k]) {
+        	if (unmask[k]) {
 	            int w = matrixMap[k] * matrixSize;
 	
 	            for (int i = 0; i < nrOfStates; i++) {
@@ -294,7 +294,7 @@ public class MixedLikelihoodCore {
 
         matrices = new double[2][nodeCount][matrixCount * matrixSize];
         
-        mask = new boolean[patternCount];
+        unmask = new boolean[patternCount];
     }
 
     /**
