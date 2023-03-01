@@ -196,7 +196,7 @@ public class MixedTreeLikelihood extends GenericTreeLikelihood {
         }
         
         matrixIndex = new int[patterns];
-        dirtySiteModels = new boolean[m_siteModel.getCategoryCount()];
+        dirtySiteModels = new boolean[m_siteModel.getMixtureComponents().size()];
     }
 
     protected MixedLikelihoodCore createLikelihoodCore(int stateCount) {
@@ -244,7 +244,7 @@ public class MixedTreeLikelihood extends GenericTreeLikelihood {
         likelihoodCore.initialize(
                 nodeCount,
                 getPatternCount(),
-                m_siteModel.getCategoryCount(),
+                m_siteModel.getMixtureComponents().size(),
                 true, m_useAmbiguities.get()
         );
 
@@ -523,7 +523,9 @@ public class MixedTreeLikelihood extends GenericTreeLikelihood {
             m_branchLengths[nodeIndex] = branchTime;
             final Node parent = node.getParent();
             likelihoodCore.setNodeMatrixForUpdate(nodeIndex);
-            for (int i = 0; i < m_siteModel.getCategoryCount(); i++) {
+            List<SubstitutionModel> components = m_siteModel.getMixtureComponents();
+            for (int i = 0; i < components.size(); i++) {
+            	// TODO: check component is dirty + branch rate is dirty, otherwise do no need to update this particular matrix 
                 m_siteModel.getTransitionProbabilities(node, parent.getHeight(), node.getHeight(), i, branchRate, probabilities);
                 //System.out.println(node.getNr() + " " + Arrays.toString(m_fProbabilities));
                 likelihoodCore.setNodeMatrix(nodeIndex, i, probabilities);

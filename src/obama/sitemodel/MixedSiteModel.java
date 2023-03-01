@@ -28,6 +28,10 @@ public class MixedSiteModel extends SiteModelInterface.Base {
 	private List<SubstitutionModel> mixtureComponent;
 	private double [][] freqs; 
 	
+	public MixedSiteModel() {
+		substModelInput.setRule(Validate.FORBIDDEN);
+	}
+	
 	public void getSiteModelIndex(int [] matrixIndex) {
 		int n = siteModelIndex.getDimension();
 		if (n != matrixIndex.length) {
@@ -37,7 +41,7 @@ public class MixedSiteModel extends SiteModelInterface.Base {
 			matrixIndex[i] = siteModelIndex.getValue(i);
 		}
 		
-		mixtureComponent = mixtureComponentInput.get();
+		initialiseMixtureComponents();
 
 		muParameter = muParameterInput.get();
 		if (muParameter == null) {
@@ -45,15 +49,18 @@ public class MixedSiteModel extends SiteModelInterface.Base {
 		}
 	}
 	
+	protected List<SubstitutionModel> initialiseMixtureComponents() {
+		return mixtureComponentInput.get();
+	}
+
 	public void getTransitionProbabilities(Node node, double startTime, double endTime, int category, double rate,
 			double[] matrix) {
     	final double jointBranchRate = /* getRateForCategory(category, node) */ rate * muParameter.getValue();
 		mixtureComponent.get(category).getTransitionProbabilities(node, startTime, endTime, jointBranchRate, matrix);
 	}
 
-	
-	public MixedSiteModel() {
-		substModelInput.setRule(Validate.FORBIDDEN);
+	public List<SubstitutionModel> getMixtureComponents() {
+		return mixtureComponent;
 	}
 	
 	@Override
