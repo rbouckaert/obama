@@ -46,6 +46,7 @@ name="alignment">
         </tree>
         <parameter id="birthRate.t:protein" name="stateNode">1.0</parameter>
         <stateNode id="siteModelIndex.s:protein" spec="parameter.IntegerParameter" dimension="234">0.0</stateNode>
+        <parameter id="mutationRate.s:protein" name="stateNode" lower="0.0">1.0</parameter>
     </state>
 
     <init id="RandomTree.t:protein" spec="beast.base.evolution.tree.coalescent.RandomTree" estimate="false" initial="@Tree.t:protein" taxa="@protein">
@@ -63,7 +64,7 @@ name="alignment">
         </distribution>
         <distribution id="likelihood" spec="beast.base.inference.CompoundDistribution" useThreads="true">
             <distribution id="treeLikelihood.protein" spec="obama.likelihood.MixedTreeLikelihood" data="@protein" tree="@Tree.t:protein">
-                <siteModel id="c20.s:protein" spec="obama.sitemodel.C20MixedSiteModel" siteModelIndex="@siteModelIndex.s:protein">
+                <siteModel id="c20.s:protein" spec="obama.sitemodel.C10MixedSiteModel" siteModelIndex="@siteModelIndex.s:protein" mutationRate="@mutationRate.s:protein">
                     <substModel spec="MTREV"/>
                 </siteModel>
                 <branchRateModel id="StrictClock.c:protein" spec="beast.base.evolution.branchratemodel.StrictClockModel">
@@ -78,6 +79,10 @@ name="alignment">
 		likelihood="@treeLikelihood.protein" 
 		siteModel="@c20.s:protein"
 		weight="3.0"/>
+
+<!--
+    <operator id="mutationRateExchanger.s:state$(n)" spec="DeltaExchangeOperator" delta="0.1" weight="8.0" parameter="@mutationRate.s:protein"/>
+-->
 
     <operator id="YuleBirthRateScaler.t:protein" spec="ScaleOperator" parameter="@birthRate.t:protein" scaleFactor="0.75" weight="3.0"/>
 
@@ -103,6 +108,7 @@ name="alignment">
         <log id="TreeHeight.t:protein" spec="beast.base.evolution.tree.TreeHeightLogger" tree="@Tree.t:protein"/>
         <log idref="YuleModel.t:protein"/>
         <log idref="birthRate.t:protein"/>
+        <log idref="mutationRate.s:protein"/>
         <log idref="siteModelIndex.s:protein"/>
     </logger>
 
