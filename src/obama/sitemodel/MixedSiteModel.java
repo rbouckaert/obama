@@ -6,6 +6,7 @@ import java.util.List;
 
 import beast.base.core.Description;
 import beast.base.core.Input;
+import beast.base.core.Log;
 import beast.base.core.Input.Validate;
 import beast.base.evolution.sitemodel.SiteModelInterface;
 import beast.base.evolution.substitutionmodel.SubstitutionModel;
@@ -17,17 +18,20 @@ import beast.base.inference.parameter.RealParameter;
 @Description("Mixture site model that allows different substitution models for different sites. "
 		+ "To be used in combination with MixedTreeLikelihood")
 public class MixedSiteModel extends SiteModelInterface.Base {
+
 	final public Input<IntegerParameter> siteModelIndexInput = new Input<>("siteModelIndex", 
 			"identifies substitution model for each site. " + 
 			"Its length should be number of sites", Validate.REQUIRED);
+	
 	final public Input<List<SubstitutionModel>> mixtureComponentInput = 
             new Input<>("component", "pool of substitution models along branches in the beast.tree", new ArrayList<>(), Validate.REQUIRED);
-    final public Input<RealParameter> muParameterInput = new Input<>("mutationRate", "mutation rate (defaults to 1.0)");
+    
+	final public Input<RealParameter> muParameterInput = new Input<>("mutationRate", "mutation rate (defaults to 1.0)");
 
     protected RealParameter muParameter;
-	private IntegerParameter siteModelIndex;
+    protected IntegerParameter siteModelIndex;
 	private List<SubstitutionModel> mixtureComponent;
-	private double [][] freqs; 
+	protected double [][] freqs; 
 	
 	public MixedSiteModel() {
 		substModelInput.setRule(Validate.FORBIDDEN);
@@ -51,7 +55,9 @@ public class MixedSiteModel extends SiteModelInterface.Base {
 	public void getSiteModelIndex(int [] matrixIndex) {
 		int n = siteModelIndex.getDimension();
 		if (n != matrixIndex.length) {
-			throw new IllegalArgumentException("Expected site model index of length " + matrixIndex.length + " instead of " + n);
+			siteModelIndex.setDimension(matrixIndex.length);
+			Log.warning("Expected site model index of length " + matrixIndex.length + " instead of " + n);
+			Log.warning("Setting dimension to " + n);
 		}
 		for (int i = 0; i < n; i++) {
 			matrixIndex[i] = siteModelIndex.getValue(i);

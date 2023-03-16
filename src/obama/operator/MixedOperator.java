@@ -13,6 +13,7 @@ import beast.base.evolution.substitutionmodel.SubstitutionModel;
 import beast.base.evolution.tree.Tree;
 import beast.base.inference.Operator;
 import beast.base.inference.parameter.IntegerParameter;
+import beast.base.inference.parameter.RealParameter;
 import beast.base.util.Randomizer;
 import obama.likelihood.MixedTreeLikelihood;
 import obama.sitemodel.MixedSiteModel;
@@ -54,16 +55,20 @@ public class MixedOperator extends Operator {
 
 	
 	class MyTreeLikelihood extends TreeLikelihood {
-		public void setSubstModel(SubstitutionModel substModel) {
+		public void setSubstModel(SubstitutionModel substModel, double substitutionRate) {
 			this.substitutionModel = substModel;
 			this.hasDirt = Tree.IS_FILTHY;
+			RealParameter mutationRate = (RealParameter) this.m_siteModel.getInput("mutationRate").get();
+			mutationRate.setValue(substitutionRate);
 		}
 	}
 	
 	class MyBeagleTreeLikelihood extends BeagleTreeLikelihood {
-		public void setSubstModel(SubstitutionModel substModel) {
+		public void setSubstModel(SubstitutionModel substModel, double substitutionRate) {
 			this.substitutionModel = substModel;
 			this.hasDirt = Tree.IS_FILTHY;
+			RealParameter mutationRate = (RealParameter) this.m_siteModel.getInput("mutationRate").get();
+			mutationRate.setValue(substitutionRate);
 		}
 	}
 
@@ -71,7 +76,7 @@ public class MixedOperator extends Operator {
 		MixedTreeLikelihood mtl = likelihoodInput.get();
 		SubstitutionModel dummySubstModel = components.get(0);
 		SiteModel siteModel = new SiteModel();
-		siteModel.initByName("substModel", dummySubstModel, "gammaCategoryCount", 1);
+		siteModel.initByName("substModel", dummySubstModel, "gammaCategoryCount", 1, "mutationRate", "1.0");
 		
 		
 		MyBeagleTreeLikelihood beagleTreeLikelihood = new MyBeagleTreeLikelihood();
@@ -145,7 +150,7 @@ public class MixedOperator extends Operator {
 
 	private void calcLikelihoodForComponent(int i) {
 		if (beagleTreeLikelihood != null) {
-			beagleTreeLikelihood.setSubstModel(components.get(i));			
+			beagleTreeLikelihood.setSubstModel(components.get(i), siteModelInput.get().getRateForCategory(i, null));			
 			
 			beagleTreeLikelihood.calculateLogP();
 			
@@ -161,7 +166,7 @@ public class MixedOperator extends Operator {
 					siteLogProbs[i], 0, patternLogLikelihoods.length);
 			}
 		} else {
-			treelikelihood.setSubstModel(components.get(i));
+			treelikelihood.setSubstModel(components.get(i), siteModelInput.get().getRateForCategory(i, null));
 			
 			treelikelihood.calculateLogP();
 			

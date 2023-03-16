@@ -141,7 +141,7 @@ public class MixtureSiteModel extends SiteModelInterface.Base {
 	}
 
 	@Override	
-	public boolean hasImaginaryEigenvectors() {
+	public boolean canReturnComplexDiagonalization() {
 		return true;
 	}
 }
