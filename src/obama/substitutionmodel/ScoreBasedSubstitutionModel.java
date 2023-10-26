@@ -107,7 +107,7 @@ abstract public class ScoreBasedSubstitutionModel extends GeneralSubstitutionMod
     }
 
     /** return scores matrix **/
-    abstract int [][] getScores();
+    public abstract int [][] getScores();
 	
 
 	@Override
