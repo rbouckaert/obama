@@ -19,7 +19,7 @@ import beast.base.core.Description;
 public class PHAT extends ScoreBasedSubstitutionModel {
 
 	@Override
-	int[][] getScores() {
+	public int[][] getScores() {
 		int [][] scores;
 		// from http://www.genome.jp/aaindex/ appears to have double the diagonal
 		/* scores = new int[][]{
