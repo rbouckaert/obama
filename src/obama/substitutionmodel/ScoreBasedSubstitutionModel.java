@@ -40,6 +40,8 @@ abstract public class ScoreBasedSubstitutionModel extends GeneralSubstitutionMod
 		setUpQMatrix();
 	}
 	
+	
+	
 	private void setUpQMatrix() {
 		int [][]scores = getScores();
 		double [] freqs = getFrequencies();

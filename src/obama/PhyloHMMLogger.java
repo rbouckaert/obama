@@ -24,7 +24,7 @@ public class PhyloHMMLogger extends BEASTObject implements Loggable {
 	@Override
 	public void init(PrintStream out) {
 
-		for (int i = 0; i < _phyloHMM.siteCount; i++) {
+		for (int i = 0; i < _phyloHMM.getSiteCount(); i++) {
 			out.print((getID() != null ? getID() : "site") + i + "\t");  
 		}
 	}
@@ -43,8 +43,8 @@ public class PhyloHMMLogger extends BEASTObject implements Loggable {
 			break;
 		}
 		
-		for (int i = 0; i < _phyloHMM.siteCount; i++) {
-			out.print(Randomizer.randomChoicePDF(_phyloHMM.HMMpartials[i]) + "\t");  
+		for (int i = 0; i < _phyloHMM.getSiteCount(); i++) {
+			out.print(Randomizer.randomChoicePDF(_phyloHMM.getHMMpartials()[i]) + "\t");  
 		}
 	}
 

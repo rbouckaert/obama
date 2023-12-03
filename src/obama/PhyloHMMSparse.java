@@ -88,10 +88,10 @@ public class PhyloHMMSparse extends PhyloHMM {
 		}
 
 		// forward
-		for (int i = 1; i < siteCount; i++) {
+		for (int i = 1; i < getSiteCount(); i++) {
 			
-			double [] p0 = HMMpartials[i - 1];
-			double [] p1 = HMMpartials[i];
+			double [] p0 = getHMMpartials()[i - 1];
+			double [] p1 = getHMMpartials()[i];
 			
 			int siteIndex = sitePatternIndex[i];
 			Arrays.fill(p1, Double.NEGATIVE_INFINITY);
@@ -121,10 +121,10 @@ public class PhyloHMMSparse extends PhyloHMM {
 		double [] transitionRates = rates.getDoubleValues();
 		
 		// forward
-		for (int i = 1; i < siteCount; i++) {
+		for (int i = 1; i < getSiteCount(); i++) {
 			
-			double [] p0 = HMMpartials[i - 1];
-			double [] p1 = HMMpartials[i];
+			double [] p0 = getHMMpartials()[i - 1];
+			double [] p1 = getHMMpartials()[i];
 			
 			double [] P = patternP[sitePatternIndex[i]];
 			
@@ -153,20 +153,20 @@ public class PhyloHMMSparse extends PhyloHMM {
 
 	/** calc state distributions in backward sweep **/
 	@Override
-	void backward() {
+	public void backward() {
 		if (isDense) {
 			super.backward();
 			return;
 		}
 
 		double [] transitionRates = rates.getDoubleValues();
-		normalise(HMMpartials[siteCount - 1]);
+		normalise(getHMMpartials()[getSiteCount() - 1]);
 		
 		double [] sum = new double[HMMStateCount];
-		for (int i = siteCount-2; i >= 0; i--) {
+		for (int i = getSiteCount()-2; i >= 0; i--) {
 			
-			double [] p1 = HMMpartials[i];
-			double [] p0 = HMMpartials[i + 1];
+			double [] p1 = getHMMpartials()[i];
+			double [] p0 = getHMMpartials()[i + 1];
 			
 			Arrays.fill(sum, 0);
 			for (int j = 0; j < transitionRates.length; j++) {

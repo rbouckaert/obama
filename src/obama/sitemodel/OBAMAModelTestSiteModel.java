@@ -10,6 +10,7 @@ import beast.base.core.Description;
 import beast.base.core.Input;
 import beast.base.core.Input.Validate;
 import beast.base.inference.parameter.IntegerParameter;
+import beast.base.inference.util.InputUtil;
 import beast.base.evolution.sitemodel.SiteModel;
 import beast.base.evolution.tree.Node;
 
@@ -139,6 +140,7 @@ public class OBAMAModelTestSiteModel extends SiteModel {
 			isDirty = true;
             ratesKnown = false;
 		}
+		
 		if (super.requiresRecalculation()) {
 			isDirty = true;
 		}
